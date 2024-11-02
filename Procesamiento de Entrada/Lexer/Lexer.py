@@ -14,11 +14,9 @@ class Token:
 
 # List of token names
 names = [
-    'Semicolon', 'BraceL', 'BraceR', 'ParenL', 'ParenR', 'BracketL', 'BracketR', 'Comma', 'Equal',
-    'Plus', 'Sub', 'Star', 'Div', 'Rem', 'Pow', 'Dot', 'Colon', 'At', 'And', 'Or', 'Not',
-    'GreaterThan', 'LessThan', 'New', 'As', 'Function', 'Let', 'In', 'If', 'Elif', 'Else', 'true',
-    'false', 'Is', 'While', 'For', 'Type', 'Inherit', 'Protocol', 'Extends', 'Comprehension', 'Number',
-    'Identifier', 'String'
+    'BraceL', 'BraceR', 'ParenL', 'ParenR', 'BracketL', 'BracketR', 'Equal',
+    'Plus', 'Sub', 'Multiplie', 'Div', 'Rem', 'Pow', 'Sen', 'Cos', 'Tan',
+    'Log', 'Exp', 'Sqrt', 'Abs', 'Number', 'Var',
 ]
 
 # Create an enum class for the token types
@@ -26,51 +24,30 @@ Terminal = enum.Enum('Terminal', names)
 
 # Dictionary mapping symbols to their corresponding token types
 sym2tk = {
-    ';': Terminal.Semicolon,
     '{': Terminal.BraceL,
     '}': Terminal.BraceR,
     '(': Terminal.ParenL,
     ')': Terminal.ParenR,
     '[': Terminal.BracketL,
     ']': Terminal.BracketR,
-    ',': Terminal.Comma,
     '=': Terminal.Equal,
     '+': Terminal.Plus,
     '-': Terminal.Sub,
-    '*': Terminal.Star,
+    '*': Terminal.Multiplie,
     '/': Terminal.Div,
     '%': Terminal.Rem,
     '^': Terminal.Pow,
-    '.': Terminal.Dot,
-    ':': Terminal.Colon,
-    '@': Terminal.At,
-    '&': Terminal.And,
-    '|': Terminal.Or,
-    '||': Terminal.Comprehension,
-    '!': Terminal.Not,
-    '>': Terminal.GreaterThan,
-    '<': Terminal.LessThan,
 }
 
 # Dictionary mapping keywords to their corresponding token types
 kw2tk = {
-    'new': Terminal.New,
-    'as': Terminal.As,
-    'function': Terminal.Function,
-    'let': Terminal.Let,
-    'in': Terminal.In,
-    'if': Terminal.If,
-    'elif': Terminal.Elif,
-    'else': Terminal.Else,
-    'true': Terminal.true,
-    'false': Terminal.false,
-    'is': Terminal.Is,
-    'while': Terminal.While,
-    'for': Terminal.For,
-    'type': Terminal.Type,
-    'inherits': Terminal.Inherit,
-    'protocol': Terminal.Protocol,
-    'extends': Terminal.Extends,
+    'sen' : Terminal.Sen,
+    'cos' : Terminal.Cos,
+    'tan' : Terminal.Tan,
+    'log' : Terminal.Log,
+    'exp' : Terminal.Exp,
+    'sqrt' : Terminal.Sqrt,
+    'abs' : Terminal.Abs,
 }
 
 # List of escaped symbols
@@ -83,7 +60,7 @@ symbols = re.compile('|'.join(escaped))
 number = re.compile(r'[0-9]+|[0-9]*\.[0-9]+')
 
 # Regular expression pattern for identifiers
-identifier = re.compile(r'[_a-zA-Z][_a-zA-Z0-9]*')
+vars = re.compile(r'[a-zA-Z]*')
 
 # Tokenize the input string
 def tokenize(input):
@@ -121,35 +98,16 @@ def tokenize(input):
             input = input[len(lexeme):]
             continue
 
-        # Match identifiers
-        match = identifier.match(input)
+        # Match variables
+        match = vars.match(input)
         if match:
             lexeme = match.group(0)
             if lexeme in kw2tk.keys():
                 tokens.append(Token(line, column, kw2tk[lexeme], lexeme))
             else:
-                tokens.append(Token(line, column, Terminal.Identifier, lexeme))
+                tokens.append(Token(line, column, Terminal.Var, lexeme))
             column += len(lexeme)
             input = input[len(lexeme):]
-            continue
-
-        # Match strings
-        if input[0] == '"':
-            i = 1
-            while input[i] != '"':
-                if input[i] == '\\':
-                    i += 1
-                i += 1
-            tokens.append(Token(line, column, Terminal.String, input[1:i]))
-            column += i + 1
-            input = input[i + 1:]
-            continue
-
-        # Skip comments
-        if input[0] == '#':
-            while input[0] != '\n':
-                column += 1
-                input = input[1:]
             continue
 
         # Raise syntax error for invalid syntax
