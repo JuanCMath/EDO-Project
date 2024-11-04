@@ -44,7 +44,7 @@ class Parse:
             op = self.tokens[self.currentIndex]
             opType = op.type
 
-            if opType not in self.defaultprecedence or self.defaultprecedence[opType] < minPrecedence or opType == 'Equal':
+            if opType not in self.defaultprecedence or self.defaultprecedence[opType] < minPrecedence:
                 return left
 
             else:
@@ -55,8 +55,10 @@ class Parse:
 
     def ParseUnaryExpression(self):
         if self.tokens[self.currentIndex + 1].type == 'MinusOne':
-            exp = self.ParsePrimaryExpression()
+
             op = self.Expect('MinusOne')
+            exp = self.ParsePrimaryExpression()
+            
             return Nodes.UnaryExpressionNode(op, exp)
         else:
             return self.ParsePrimaryExpression()
@@ -66,6 +68,18 @@ class Parse:
             return Nodes.NumberNode(self.ExpectNumber())
         
         elif self.Match('ParenL'):
+            self.Expect('ParenL')
+            exp = self.ParseExpression()
+            self.Expect('ParenR')
+            return Nodes.GroupingNode(exp)
+        
+        elif self.Match('BraceL'):
+            self.Expect('ParenL')
+            exp = self.ParseExpression()
+            self.Expect('ParenR')
+            return Nodes.GroupingNode(exp)
+        
+        elif self.Match('BracketL'):
             self.Expect('ParenL')
             exp = self.ParseExpression()
             self.Expect('ParenR')
