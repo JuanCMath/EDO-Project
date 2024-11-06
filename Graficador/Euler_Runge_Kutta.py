@@ -1,4 +1,5 @@
 import numpy as np  
+from scipy.integrate import odeint
 import matplotlib.pyplot as plt  
 
 # Definición de la función derivada  
@@ -52,31 +53,25 @@ def runge_kutta_4(f, t0, y0, h, n):
     
     return t_values, y_values  
 
-# Parámetros  
-t0 = 0      # Valor inicial de t  
-y0 = 1      # Valor inicial de y  
-h = 0.2     # Tamaño del paso (ajustado para mejor visualización)  
-n = 50      # Número de pasos  
+# Función para graficar el campo de isoclinas
+def plot_isoclines(f, t_range, y_range, num_points=50):
+    t = np.linspace(t_range[0], t_range[1], num_points)
+    y = np.linspace(y_range[0], y_range[1], num_points)
+    T, Y = np.meshgrid(t, y)
+    F = f(T, Y)
 
-# Calcular los valores  
-t_values_exact = np.linspace(t0, t0 + n * h, n + 1)  
-y_values_exact = exact_solution(t_values_exact)  
+    # Normalize the arrows
+    U = np.ones_like(F)
+    V = F / np.sqrt(1 + F**2)
 
-t_values_euler, y_values_euler = euler_improved(f, t0, y0, h, n)  
-t_values_rk4, y_values_rk4 = runge_kutta_4(f, t0, y0, h, n)  
+    return T, Y, U, V
 
-# Graficar los resultados  
-plt.figure(figsize=(10, 6))  
-plt.plot(t_values_exact, y_values_exact, label='Solución Exacta', color='green', linewidth=2)  
-plt.plot(t_values_euler, y_values_euler, label='Euler Mejorado', marker='o', markersize=4, linestyle='--', color='blue') # Cambiar estilo  
-plt.plot(t_values_rk4, y_values_rk4, label='Runge-Kutta 4º Orden', marker='x', markersize=6, linestyle=':', color='red') # Cambiar estilo y tamaño de marcador  
 
-# Configuración de la gráfica  
-plt.title("Comparación de Métodos de Solución de EDO")  
-plt.xlabel('t')  
-plt.ylabel('y')  
-plt.legend()  
-plt.grid()  
-plt.xlim(t0, t0 + n * h)  # Asegúrate de que se visualiza bien el intervalo  
-plt.ylim(min(y_values_exact) - 1, max(y_values_exact) + 1)  # Ajustar el límite para mejor visualización  
-plt.show()
+# Función para determinar la solución exacta de la EDO
+def exact_solution(f, t0, y0, t_values=np.linspace(-10, 10, 100)):
+
+    def wrapper(y, t):
+        return f(t, y)
+
+    y_values = odeint(wrapper, y0, t_values)
+    return t_values, y_values.flatten()

@@ -2,11 +2,12 @@ import flet as ft
 import matplotlib.pyplot as plt
 import numpy as np
 from flet.matplotlib_chart import MatplotlibChart
-
+from Graficador import Euler_Runge_Kutta
+import sympy as sp
 
 def main(page: ft.Page):
     # Buttons functionality
-    def solving(
+    def solving( #TODO: Add the solution to the problem
         derivativeAsString,
         xConditionAsString,
         yConditionAsString,
@@ -45,10 +46,54 @@ def main(page: ft.Page):
         hStepAsString,
         valueToCalculateAsString,
     ):
-        print("*Changes graph magically*")
+        # Getting the function from the input
+        x, y = sp.symbols('x y')
+        user_function = sp.sympify(derivativeAsString.value)
+        f = sp.lambdify((x, y), user_function, 'numpy')
+
+        # Getting the inputs Value
+        x_val = float(xConditionAsString.value)
+        y_val = float(yConditionAsString.value)
+        h = float(hStepAsString.value)
+        n = float(valueToCalculateAsString.value)
+
+
+        # Exact solution #TODO
+        t_values_exact, y_values_exact = Euler_Runge_Kutta.exact_solution(f ,x_val, y_val)
+
+        #Euler Improved
+        t_values_euler, y_values_euler = Euler_Runge_Kutta.euler_improved(f, x_val, y_val, h, 20)
+
+        # Runge_kutta_4
+        t_values_runge_kutta, y_values_runge_kutta = Euler_Runge_Kutta.runge_kutta_4(f, x_val, y_val, h, 20)
+
+
+        #Isoclinas
+        T, Y, U, V = Euler_Runge_Kutta.plot_isoclines(f, (-10, 10), (-10, 10))
+
+        # Plot the results
+        fig, ax = plt.subplots()
+
+        ax.plot(t_values_exact, y_values_exact, label='Solucion Exacta', color='green', linewidth=2)
+        ax.plot(t_values_euler, y_values_euler, label='Euler Mejorado', marker='o', markersize=4, linestyle='--', color='blue')
+        ax.plot(t_values_runge_kutta, y_values_runge_kutta, label='Runge-Kutta 4º Orden', marker='x', markersize=6, linestyle=':', color='red')
+        ax.quiver(T, Y, U, V, color='gray', alpha=0.5)
+        ax.set_xlabel("x")
+        ax.set_ylabel("y")
+        ax.set_title("Solución de EDO")
+        ax.grid(True)
+        ax.legend()
+
+        # Set axis limits
+        ax.set_xlim(-10, 10)
+        ax.set_ylim(-10, 10)
+
+        # Adding the graph to the display
+        graph_container.content = MatplotlibChart(fig, expand=True)
+        page.update()
 
     # Equations input
-    solution = ft.TextField(label="Resultado:", read_only=True, width=400)
+    solution = ft.Text(value="Resultado:", width=400)
     tb1 = ft.TextField(label="y'", width=400)
     tb2 = ft.TextField(label="x0", width=400)
     tb3 = ft.TextField(label="y0", width=400)
@@ -60,12 +105,12 @@ def main(page: ft.Page):
         on_click=lambda ignoredParameter: onGraphingClick(tb1, tb2, tb3, tb4, tb5),
     )
     # Create a container for the graph
-    graph_container = ft.Container(width=600, height=400, alignment=ft.alignment.center)
+    graph_container = ft.Container(width=1000, height=700, alignment=ft.alignment.center)
 
     # Layout the components
     input_column = ft.Column(
         [
-            tb1, tb2, tb3, tb4, tb5, solution, solvingButton, graphingButton
+            tb1, tb2, tb3, tb4, tb5,  solvingButton, solution, graphingButton
         ],
         width=300,
         spacing=10,
@@ -82,6 +127,5 @@ def main(page: ft.Page):
 
     page.add(main_row)
     createGraph()
-
 
 ft.app(main)
