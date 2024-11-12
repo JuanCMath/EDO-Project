@@ -30,10 +30,10 @@ def main(page: ft.Page):
         t_values_exact, y_values_exact = Euler_Runge_Kutta.exact_solution(f ,x_val, y_val)
 
         # Euler Improved
-        t_values_euler, y_values_euler = Euler_Runge_Kutta.euler_improved(f, x_val, y_val, h, 20)
+        t_values_euler, y_values_euler = Euler_Runge_Kutta.euler_improved(f, x_val, y_val, h, 40)
 
         # Runge_kutta_4
-        t_values_runge_kutta, y_values_runge_kutta = Euler_Runge_Kutta.runge_kutta_4(f, x_val, y_val, h, 20)
+        t_values_runge_kutta, y_values_runge_kutta = Euler_Runge_Kutta.runge_kutta_4(f, x_val, y_val, h, 40)
 
         # Plot the results
         ax.plot(t_values_exact, y_values_exact, label='Solucion Exacta', color='green', linewidth=2)
