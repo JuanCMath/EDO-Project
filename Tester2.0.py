@@ -1,13 +1,7 @@
 import numpy as np  
 import matplotlib.pyplot as plt  
-
-# Función que representa la ecuación diferencial  
-def f(t, y):  
-    return y + t  # dy/dt = y + t  
-
-# Solución exacta  
-def exact_solution(t):  
-    return np.exp(t) - t - 1  # Solución exacta de la ecuación diferencial  
+import Graficador.Euler_Runge_Kutta as ERK
+import sympy as sp
 
 # Método de Euler  
 def euler_method(f, t0, y0, h, n):  
@@ -31,7 +25,12 @@ def runge_kutta_4(f, t0, y0, h, n):
         t += h  
     return y  
 
-def precision_tester():  
+def precision_tester(input):  
+
+    x, y = sp.symbols('x y')
+    user_function = sp.sympify(input)
+    f = sp.lambdify((x, y), user_function, 'numpy')
+
     t0 = 0  
     y0 = 1  
     
@@ -44,21 +43,21 @@ def precision_tester():
     
     current_t = t0  
 
-    while current_t < 4:  
-        y_euler = euler_method(f, current_t, y0, h, n)  
-        y_rk4 = runge_kutta_4(f, current_t, y0, h, n)  
+    for i in range(n):  
+        y_euler = ERK.euler_improved(f, current_t, y0, h, n)  
+        y_rk4 = ERK.runge_kutta_4(f, current_t, y0, h, n)  
         
-        y_exact = exact_solution(current_t + h * n)  
+        y_exact = ERK.exact_solution(f, t0, y0)  
 
-        error_euler = abs(y_euler - y_exact)  
-        error_rk4 = abs(y_rk4 - y_exact)  
+        error_euler = abs(y_euler[-1][-1] - y_exact[-1][-1])  
+        error_rk4 = abs(y_rk4[-1][-1] - y_exact[-1][-1])  
 
         euler_errors.append(error_euler)  
         rk4_errors.append(error_rk4)  
         steps.append(current_t + h * n)  
 
-        print(f"t = {current_t + h * n:.2f} | Euler: {y_euler:.12f}, Error Euler: {error_euler:.12f}")  
-        print(f"t = {current_t + h * n:.2f} | RK4: {y_rk4:.12f}, Error RK4: {error_rk4:.12f}")  
+        #print(f"t = {current_t + h * n:.2f} | Euler: {y_euler:.12f}, Error Euler: {error_euler:.12f}")  
+        #print(f"t = {current_t + h * n:.2f} | RK4: {y_rk4:.12f}, Error RK4: {error_rk4:.12f}")  
 
         h /= 2  
         n *= 2  
@@ -85,7 +84,7 @@ def precision_tester():
     plt.show()  
 
 # Ejecuta el tester  
-precision_tester()
+precision_tester("x+y")
 
 
 #TODO : parte aparte de decimal 

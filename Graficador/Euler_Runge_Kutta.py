@@ -51,9 +51,9 @@ def plot_isoclines(f, t_range, y_range, num_points=30):
 
     return T, Y, U, V
 
-def exact_solution(f, t0, y0, t_values=np.linspace(-10, 10, 100)):
+def exact_solution(f, x0, y0, x_values=np.linspace(-10, 10, 100)):
     def wrapper(y, t):
         return f(t, y)
 
-    y_values = odeint(wrapper, y0, t_values)
-    return t_values, y_values.flatten()
+    y_values = odeint(wrapper, y0, x_values)
+    return x_values, y_values.flatten()
