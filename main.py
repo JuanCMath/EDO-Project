@@ -86,11 +86,30 @@ def precision_tester(derivative_as_string, x_condition, y_condition, h_step, ax)
     for step, euler_error, rk4_error in zip(steps, euler_errors, rk4_errors):
         ax.text(step, rk4_error, f'{rk4_error:.2e}', fontsize=10, vertical_alignment='bottom', horizontal_alignment='center', color='red')
         ax.text(step, euler_error, f'{euler_error:.2e}', fontsize=10, vertical_alignment='top', horizontal_alignment='center', color='blue')
-        
+
+def validate_inputs(*inputs):
+    try:
+        sp.sympify(inputs[0])  # Validate mathematical function
+    except sp.SympifyError:
+        return False, "Invalid mathematical function in f(x,y)."
+    
+    for i, inp in enumerate(inputs[1:], start=1):
+        try:
+            float(inp)  # Validate numerical inputs
+        except ValueError:
+            return False, f"Invalid numerical input in field {i}."
+    
+    return True, ""
+
 def main(page: ft.Page):
     page.title = "Calculador de Ecuaciones Diferenciales Ordinarias de 1er grado"
 
     def solving(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
+        is_valid, error_message = validate_inputs(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string)
+        if not is_valid:
+            page.snack_bar = ft.SnackBar(ft.Text(error_message), open=True)
+            page.update()
+            return
         x, y = sp.symbols('x y')
         user_function = sp.sympify(derivative_as_string)
         f = sp.lambdify((x, y), user_function, 'numpy')
@@ -109,6 +128,11 @@ def main(page: ft.Page):
         page.update()
 
     def on_graphing_click(derivative_as_string):
+        is_valid, error_message = validate_inputs(derivative_as_string)
+        if not is_valid:
+            page.snack_bar = ft.SnackBar(ft.Text(error_message), open=True)
+            page.update()
+            return
         x, y = sp.symbols('x y')
         user_function = sp.sympify(derivative_as_string)
         f = sp.lambdify((x, y), user_function, 'numpy')
@@ -123,6 +147,11 @@ def main(page: ft.Page):
         page.update()
 
     def show_precision_tester(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string):
+        is_valid, error_message = validate_inputs(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string)
+        if not is_valid:
+            page.snack_bar = ft.SnackBar(ft.Text(error_message), open=True)
+            page.update()
+            return
         ax.clear()
         precision_tester(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, ax)
         graph_container.content = MatplotlibChart(fig, expand=True)
