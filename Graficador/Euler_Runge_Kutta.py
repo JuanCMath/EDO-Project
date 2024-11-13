@@ -4,20 +4,20 @@ from scipy.integrate import odeint
 def euler_improved(f, x0, y0, h, n):
     x_values = [x0]
     y_values = [y0]
-    
+
     for i in range(n):
         t = x_values[-1]
         y = y_values[-1]
-        
+
         k1 = f(t, y)
         y_predict = y + h * k1
-        
+
         k2 = f(t + h, y_predict)
         y_corrected = y + (h / 2) * (k1 + k2)
-        
+
         x_values.append(t + h)
         y_values.append(y_corrected)
-    
+
     return x_values, y_values
 
 def runge_kutta_4(f, x0, y0, h, n):
@@ -41,15 +41,13 @@ def runge_kutta_4(f, x0, y0, h, n):
     return x_values, y_values
 
 def plot_isoclines(f, x_range, y_range, num_points=30):
-    t = np.linspace(x_range[0], x_range[1], num_points)
-    y = np.linspace(y_range[0], y_range[1], num_points)
-    T, Y = np.meshgrid(t, y)
-    F = f(T, Y)
+    t, y = np.meshgrid(np.linspace(x_range[0], x_range[1], num_points), np.linspace(y_range[0], y_range[1], num_points))
+    f = f(t, y)
 
-    U = np.ones_like(F)
-    V = F / np.sqrt(1 + F**2)
+    u = np.ones_like(f)
+    v = f / np.sqrt(1 + f**2)
 
-    return T, Y, U, V
+    return t, y, u, v
 
 def exact_solution(f, x0, y0, x_values=np.linspace(-10, 10, 100)):
     def wrapper(y, x):

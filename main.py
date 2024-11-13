@@ -1,9 +1,9 @@
 import flet as ft
 import matplotlib.pyplot as plt
 import numpy as np
+import sympy as sp
 from flet.matplotlib_chart import MatplotlibChart
 from Graficador import Euler_Runge_Kutta
-import sympy as sp
 
 # Global figures and axes
 fig, ax = plt.subplots()
@@ -33,8 +33,8 @@ def create_graph(ax):
     ax.legend()
 
 def plot_isoclines(ax, f):
-    T, Y, U, V = Euler_Runge_Kutta.plot_isoclines(f, (-25, 25), (-25, 25))
-    ax.quiver(T, Y, U, V, color='gray', alpha=0.5)
+    t, y, u, v = Euler_Runge_Kutta.plot_isoclines(f, (-25, 25), (-25, 25))
+    ax.quiver(t, y, u, v, color='gray', alpha=0.5)
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_title("Solución de EDO")
@@ -84,21 +84,21 @@ def precision_tester(derivative_as_string, x_condition, y_condition, h_step, ax)
 
     # Agregar anotaciones de texto en la gráfica
     for step, euler_error, rk4_error in zip(steps, euler_errors, rk4_errors):
-        ax.text(step, rk4_error, f'{rk4_error:.2e}', fontsize=10, verticalalignment='bottom', horizontalalignment='center', color='red')
-        ax.text(step, euler_error, f'{euler_error:.2e}', fontsize=10, verticalalignment='top', horizontalalignment='center', color='blue')
-
+        ax.text(step, rk4_error, f'{rk4_error:.2e}', fontsize=10, vertical_alignment='bottom', horizontal_alignment='center', color='red')
+        ax.text(step, euler_error, f'{euler_error:.2e}', fontsize=10, vertical_alignment='top', horizontal_alignment='center', color='blue')
+        
 def main(page: ft.Page):
-    page.title = "Calculador de Ecuaciones Diferenciales Ordinarias"
+    page.title = "Calculador de Ecuaciones Diferenciales Ordinarias de 1er grado"
 
     def solving(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
         x, y = sp.symbols('x y')
-        user_function = sp.sympify(derivative_as_string.value)
+        user_function = sp.sympify(derivative_as_string)
         f = sp.lambdify((x, y), user_function, 'numpy')
 
-        x_val = float(x_condition_as_string.value)
-        y_val = float(y_condition_as_string.value)
-        h = float(h_step_as_string.value)
-        n = int(amount_of_steps_as_string.value)
+        x_val = float(x_condition_as_string)
+        y_val = float(y_condition_as_string)
+        h = float(h_step_as_string)
+        n = int(amount_of_steps_as_string)
 
         t_values_exact, y_values_exact = Euler_Runge_Kutta.exact_solution(f, x_val, y_val)
         t_values_euler, y_values_euler = Euler_Runge_Kutta.euler_improved(f, x_val, y_val, h, n)
@@ -110,7 +110,7 @@ def main(page: ft.Page):
 
     def on_graphing_click(derivative_as_string):
         x, y = sp.symbols('x y')
-        user_function = sp.sympify(derivative_as_string.value)
+        user_function = sp.sympify(derivative_as_string)
         f = sp.lambdify((x, y), user_function, 'numpy')
         plot_isoclines(ax, f)
         graph_container.content = MatplotlibChart(fig, expand=True)
@@ -127,7 +127,6 @@ def main(page: ft.Page):
         precision_tester(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, ax)
         graph_container.content = MatplotlibChart(fig, expand=True)
         page.update()
-    
 
 
     tb1 = ft.TextField(label="f(x,y)", width=400)
@@ -136,41 +135,25 @@ def main(page: ft.Page):
     tb4 = ft.TextField(label="Paso h", width=400)
     tb5 = ft.TextField(label="Cantidad de pasos", width=400)
 
-    solving_button = ft.ElevatedButton(
-        text="Resolver", 
-        on_click=lambda ignored_parameter: solving(tb1, tb2, tb3, tb4, tb5)
-    )
-    graphing_button = ft.ElevatedButton(
-        text="Graficar",
-        on_click=lambda ignored_parameter: on_graphing_click(tb1),
-    )
-    reset_button = ft.ElevatedButton(
-        text="Reset",
-        on_click=lambda ignored_parameter: reset_graph(),
-    )
-    precision_button = ft.ElevatedButton(
-        text="Mostrar Precisión",
-        on_click=lambda ignored_parameter: show_precision_tester(tb1.value, float(tb2.value), float(tb3.value), float(tb4.value)),
-    )
+    solving_button = ft.ElevatedButton(text="Resolver", 
+                                       on_click = lambda ignored_parameter: solving(tb1.value, tb2.value, tb3.value, tb4.value, tb5.value))
+
+    graphing_button = ft.ElevatedButton(text="Graficar", 
+                                        on_click = lambda ignored_parameter: on_graphing_click(tb1.value))
+
+    reset_button = ft.ElevatedButton(text="Reset", 
+                                     on_click=lambda ignored_parameter: reset_graph())
+
+    precision_button = ft.ElevatedButton(text="Mostrar Precisión", 
+                                         on_click=lambda ignored_parameter: show_precision_tester(tb1.value, float(tb2.value), float(tb3.value), float(tb4.value)))
 
     graph_container = ft.Container(width=1000, height=700, alignment=ft.alignment.center)
 
-    input_column = ft.Column(
-        [
-            tb1, tb2, tb3, tb4, tb5, solving_button, graphing_button,  precision_button, reset_button,
-        ],
-        width=300,
-        spacing=10,
-    )
+    input_column = ft.Column([tb1, tb2, tb3, tb4, tb5, solving_button, graphing_button,  precision_button, reset_button], 
+                             width=300, spacing=10)
 
-    main_row = ft.Row(
-        [
-            input_column,
-            ft.Container(content=graph_container, expand=True, alignment=ft.alignment.center)
-        ],
-        expand=True,
-        alignment="spaceBetween",
-    )
+    main_row = ft.Row([input_column, ft.Container(content=graph_container, expand=True, alignment=ft.alignment.center)],
+                       expand=True, alignment="spaceBetween")
 
     page.add(main_row)
     create_graph(ax)
