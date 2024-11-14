@@ -87,15 +87,16 @@ def precision_tester(derivative_as_string, x_condition, y_condition, h_step, ax)
         ax.text(step, rk4_error, f'{rk4_error:.2e}', fontsize=10, vertical_alignment='bottom', horizontal_alignment='center', color='red')
         ax.text(step, euler_error, f'{euler_error:.2e}', fontsize=10, vertical_alignment='top', horizontal_alignment='center', color='blue')
 
+
 def validate_inputs(*inputs):
     try:
-        sp.sympify(inputs[0])  # Validate mathematical function
+        sp.sympify(inputs[0])  
     except sp.SympifyError:
         return False, "Invalid mathematical function in f(x,y)."
     
     for i, inp in enumerate(inputs[1:], start=1):
         try:
-            float(inp)  # Validate numerical inputs
+            float(inp)  
         except ValueError:
             return False, f"Invalid numerical input in field {i}."
     
@@ -105,11 +106,14 @@ def main(page: ft.Page):
     page.title = "Calculador de Ecuaciones Diferenciales Ordinarias de 1er grado"
 
     def solving(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
+
         is_valid, error_message = validate_inputs(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string)
         if not is_valid:
             page.snack_bar = ft.SnackBar(ft.Text(error_message), open=True)
             page.update()
             return
+        
+
         x, y = sp.symbols('x y')
         user_function = sp.sympify(derivative_as_string)
         f = sp.lambdify((x, y), user_function, 'numpy')
@@ -128,11 +132,13 @@ def main(page: ft.Page):
         page.update()
 
     def on_graphing_click(derivative_as_string):
+
         is_valid, error_message = validate_inputs(derivative_as_string)
         if not is_valid:
             page.snack_bar = ft.SnackBar(ft.Text(error_message), open=True)
             page.update()
             return
+        
         x, y = sp.symbols('x y')
         user_function = sp.sympify(derivative_as_string)
         f = sp.lambdify((x, y), user_function, 'numpy')
@@ -148,15 +154,81 @@ def main(page: ft.Page):
 
     def show_precision_tester(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string):
         is_valid, error_message = validate_inputs(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string)
+
         if not is_valid:
             page.snack_bar = ft.SnackBar(ft.Text(error_message), open=True)
             page.update()
             return
+        
         ax.clear()
         precision_tester(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, ax)
         graph_container.content = MatplotlibChart(fig, expand=True)
         page.update()
 
+    def show_table(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
+        is_valid, error_message = validate_inputs(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string)
+        if not is_valid:
+            page.snack_bar = ft.SnackBar(ft.Text(error_message), open=True)
+            page.update()
+            return
+
+        x, y = sp.symbols('x y')
+        user_function = sp.sympify(derivative_as_string)
+        f = sp.lambdify((x, y), user_function, 'numpy')
+
+        x_val = float(x_condition_as_string)
+        y_val = float(y_condition_as_string)
+        h = float(h_step_as_string)
+        n = int(amount_of_steps_as_string)
+
+        x_exact, y_exact = Euler_Runge_Kutta.exact_solution(f, x_val, y_val)
+        x_euler, y_euler = Euler_Runge_Kutta.euler_improved(f, x_val, y_val, h, n)
+        x_rk4, y_rk4 = Euler_Runge_Kutta.runge_kutta_4(f, x_val, y_val, h, n)
+
+        euler_errors = []
+        rk4_errors = []
+        steps = []
+
+        for i in range(n):
+            error_euler = abs(y_euler[i] - y_exact[i])
+            error_rk4 = abs(y_rk4[i] - y_exact[i])
+
+            euler_errors.append(error_euler)
+            rk4_errors.append(error_rk4)
+            steps.append(x_val + h * i)
+
+        table_rows = [
+            ft.DataRow(cells=[
+                ft.DataCell(ft.Text(f"{step:.2f}")),
+                ft.DataCell(ft.Text(f"{y_exact[i]:.2f}")),
+                ft.DataCell(ft.Text(f"{y_euler[i]:.2f}")),
+                ft.DataCell(ft.Text(f"{y_rk4[i]:.2f}")),
+                ft.DataCell(ft.Text(f"{euler_errors[i]:.2e}")),
+                ft.DataCell(ft.Text(f"{rk4_errors[i]:.2e}")),
+            ]) for i, step in enumerate(steps)
+        ]
+
+        table = ft.DataTable(
+            columns=[
+                ft.DataColumn(ft.Text("Step")),
+                ft.DataColumn(ft.Text("Exact Solution")),
+                ft.DataColumn(ft.Text("Euler Solution")),
+                ft.DataColumn(ft.Text("RK4 Solution")),
+                ft.DataColumn(ft.Text("Euler Error")),
+                ft.DataColumn(ft.Text("RK4 Error")),
+            ],
+            rows=table_rows,
+        )
+
+        scrollable_table = ft.ListView(
+            controls=[table],
+            auto_scroll=True,
+            width=1000,
+            height=700
+        )
+
+        graph_container.content = scrollable_table
+        page.update()
 
     tb1 = ft.TextField(label="f(x,y)", width=400)
     tb2 = ft.TextField(label="x0", width=400)
@@ -175,10 +247,13 @@ def main(page: ft.Page):
 
     precision_button = ft.ElevatedButton(text="Mostrar Precisión", 
                                          on_click=lambda ignored_parameter: show_precision_tester(tb1.value, float(tb2.value), float(tb3.value), float(tb4.value)))
+    
+    toggle_table_button = ft.ElevatedButton(text="Mostrar Tabla", 
+                                           on_click=lambda ignored_parameter: show_table(tb1.value, tb2.value, tb3.value, tb4.value, tb5.value))
 
     graph_container = ft.Container(width=1000, height=700, alignment=ft.alignment.center)
 
-    input_column = ft.Column([tb1, tb2, tb3, tb4, tb5, solving_button, graphing_button,  precision_button, reset_button], 
+    input_column = ft.Column([tb1, tb2, tb3, tb4, tb5, solving_button, graphing_button,  precision_button, reset_button, toggle_table_button], 
                              width=300, spacing=10)
 
     main_row = ft.Row([input_column, ft.Container(content=graph_container, expand=True, alignment=ft.alignment.center)],
