@@ -256,7 +256,7 @@ def main(page: ft.Page):
 
     graph_container = ft.Container(width=1000, height=700, alignment=ft.alignment.center)
 
-    input_column = ft.Column([tb1, tb2, tb3, tb4, tb5, solving_button, graphing_button,  precision_button, reset_button, toggle_table_button], 
+    input_column = ft.Column([tb1, tb2, tb3, tb4, tb5, solving_button, graphing_button,  precision_button, toggle_table_button, reset_button], 
                              width=300, spacing=10)
 
     main_row = ft.Row([input_column, ft.Container(content=graph_container, expand=True, alignment=ft.alignment.center)],
