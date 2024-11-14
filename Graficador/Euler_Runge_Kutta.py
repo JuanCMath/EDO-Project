@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.integrate import odeint
+import sympy as sp
 
 def euler_improved(f, x0, y0, h, n):
     x_values = [x0]
@@ -49,9 +50,21 @@ def plot_isoclines(f, x_range, y_range, num_points=30):
 
     return t, y, u, v
 
-def exact_solution(f, x0, y0, x_values=np.linspace(-10, 10, 100)):
-    def wrapper(y, x):
-        return f(x, y)
+def exact_solution(f, x0, y0, step):
 
-    y_values = odeint(wrapper, y0, x_values)
-    return x_values, y_values.flatten()
+    x_values = np.arange(-25, 25 + step, step)
+
+    x = sp.symbols('x')
+    y = sp.Function('y')(x)
+    
+    edo = sp.Eq(y.diff(x), f(x, y))
+    sol = sp.dsolve(edo, y)
+    
+    C = sp.symbols('C')
+    particular_sol = sol.subs('C1', C)
+    C_value = sp.solve(particular_sol.rhs.subs(x, x0) - y0, C)[0]
+    particular_sol = particular_sol.subs(C, C_value)
+    
+    y_values = [particular_sol.rhs.subs(x, val).evalf() for val in x_values]
+    
+    return x_values, y_values

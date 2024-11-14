@@ -44,13 +44,11 @@ def plot_isoclines(ax, f):
     ax.set_xlim(-25, 25)
     ax.set_ylim(-25, 25)
 
-def precision_tester(derivative_as_string, x_condition, y_condition, h_step, ax):
+def precision_tester(derivative_as_string, x_condition, y_condition, h_step, amount_of_steps_as_string, ax):
 
     x, y = sp.symbols('x y')
     user_function = sp.sympify(derivative_as_string)
     f = sp.lambdify((x, y), user_function, 'numpy')
-
-    n = 40
 
     euler_errors = []
     rk4_errors = []
@@ -59,14 +57,17 @@ def precision_tester(derivative_as_string, x_condition, y_condition, h_step, ax)
     current_x = float(x_condition)
     y_condition = float(y_condition)
     h_step = float(h_step)
+    n = int(amount_of_steps_as_string)
 
+    x_exact, y_exact = Euler_Runge_Kutta.exact_solution(f, x_condition, y_condition, h_step)
     x_euler, y_euler = Euler_Runge_Kutta.euler_improved(f, current_x, y_condition, h_step, n)
     x_rk4, y_rk4 = Euler_Runge_Kutta.runge_kutta_4(f, current_x, y_condition, h_step, n)
-    x_exact, y_exact = Euler_Runge_Kutta.exact_solution(f, x_condition, y_condition)
 
+    first_index = np.where(x_exact == x_euler[0])[0][0]
+    
     for i in range (n):
-        error_euler = abs(y_euler[i] - y_exact[i])
-        error_rk4 = abs(y_rk4[i] - y_exact[i])
+        error_euler = abs(y_euler[i] - y_exact[first_index + i])
+        error_rk4 = abs(y_rk4[i] - y_exact[first_index + i])
 
         euler_errors.append(error_euler)
         rk4_errors.append(error_rk4)
@@ -84,8 +85,8 @@ def precision_tester(derivative_as_string, x_condition, y_condition, h_step, ax)
 
     # Agregar anotaciones de texto en la gráfica
     for step, euler_error, rk4_error in zip(steps, euler_errors, rk4_errors):
-        ax.text(step, rk4_error, f'{rk4_error:.2e}', fontsize=10, vertical_alignment='bottom', horizontal_alignment='center', color='red')
-        ax.text(step, euler_error, f'{euler_error:.2e}', fontsize=10, vertical_alignment='top', horizontal_alignment='center', color='blue')
+        ax.text(step, rk4_error, f'{float(rk4_error):.2e}', fontsize=10, va='bottom', ha='center', color='red')
+        ax.text(step, euler_error, f'{float(euler_error):.2e}', fontsize=10, va='top', ha='center', color='blue')
 
 
 def validate_inputs(*inputs):
@@ -123,7 +124,7 @@ def main(page: ft.Page):
         h = float(h_step_as_string)
         n = int(amount_of_steps_as_string)
 
-        t_values_exact, y_values_exact = Euler_Runge_Kutta.exact_solution(f, x_val, y_val)
+        t_values_exact, y_values_exact = Euler_Runge_Kutta.exact_solution(f, x_val, y_val, h)
         t_values_euler, y_values_euler = Euler_Runge_Kutta.euler_improved(f, x_val, y_val, h, n)
         t_values_runge_kutta, y_values_runge_kutta = Euler_Runge_Kutta.runge_kutta_4(f, x_val, y_val, h, n)
 
@@ -152,8 +153,8 @@ def main(page: ft.Page):
         graph_container.content = MatplotlibChart(fig, expand=True)
         page.update()
 
-    def show_precision_tester(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string):
-        is_valid, error_message = validate_inputs(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string)
+    def show_precision_tester(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
+        is_valid, error_message = validate_inputs(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string)
 
         if not is_valid:
             page.snack_bar = ft.SnackBar(ft.Text(error_message), open=True)
@@ -161,7 +162,7 @@ def main(page: ft.Page):
             return
         
         ax.clear()
-        precision_tester(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, ax)
+        precision_tester(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string,amount_of_steps_as_string, ax)
         graph_container.content = MatplotlibChart(fig, expand=True)
         page.update()
 
@@ -181,7 +182,7 @@ def main(page: ft.Page):
         h = float(h_step_as_string)
         n = int(amount_of_steps_as_string)
 
-        x_exact, y_exact = Euler_Runge_Kutta.exact_solution(f, x_val, y_val)
+        x_exact, y_exact = Euler_Runge_Kutta.exact_solution(f, x_val, y_val, h)
         x_euler, y_euler = Euler_Runge_Kutta.euler_improved(f, x_val, y_val, h, n)
         x_rk4, y_rk4 = Euler_Runge_Kutta.runge_kutta_4(f, x_val, y_val, h, n)
 
@@ -189,9 +190,11 @@ def main(page: ft.Page):
         rk4_errors = []
         steps = []
 
+        first_index = np.where(x_exact == x_euler[0])[0][0]
+
         for i in range(n):
-            error_euler = abs(y_euler[i] - y_exact[i])
-            error_rk4 = abs(y_rk4[i] - y_exact[i])
+            error_euler = abs(y_euler[i] - y_exact[first_index + i])
+            error_rk4 = abs(y_rk4[i] - y_exact[first_index + i])
 
             euler_errors.append(error_euler)
             rk4_errors.append(error_rk4)
@@ -200,17 +203,17 @@ def main(page: ft.Page):
         table_rows = [
             ft.DataRow(cells=[
                 ft.DataCell(ft.Text(f"{step:.2f}")),
-                ft.DataCell(ft.Text(f"{y_exact[i]:.2f}")),
-                ft.DataCell(ft.Text(f"{y_euler[i]:.2f}")),
-                ft.DataCell(ft.Text(f"{y_rk4[i]:.2f}")),
-                ft.DataCell(ft.Text(f"{euler_errors[i]:.2e}")),
-                ft.DataCell(ft.Text(f"{rk4_errors[i]:.2e}")),
+                ft.DataCell(ft.Text(f"{float(y_exact[first_index + i]):.2f}")),
+                ft.DataCell(ft.Text(f"{float(y_euler[i]):.2f}")),
+                ft.DataCell(ft.Text(f"{float(y_rk4[i]):.2f}")),
+                ft.DataCell(ft.Text(f"{float(euler_errors[i]):.2e}")),
+                ft.DataCell(ft.Text(f"{float(rk4_errors[i]):.2e}")),
             ]) for i, step in enumerate(steps)
         ]
 
         table = ft.DataTable(
             columns=[
-                ft.DataColumn(ft.Text("Step")),
+                ft.DataColumn(ft.Text("X Values")),
                 ft.DataColumn(ft.Text("Exact Solution")),
                 ft.DataColumn(ft.Text("Euler Solution")),
                 ft.DataColumn(ft.Text("RK4 Solution")),
@@ -246,7 +249,7 @@ def main(page: ft.Page):
                                      on_click=lambda ignored_parameter: reset_graph())
 
     precision_button = ft.ElevatedButton(text="Mostrar Precisión", 
-                                         on_click=lambda ignored_parameter: show_precision_tester(tb1.value, float(tb2.value), float(tb3.value), float(tb4.value)))
+                                         on_click=lambda ignored_parameter: show_precision_tester(tb1.value, float(tb2.value), float(tb3.value), float(tb4.value), float(tb5.value)))
     
     toggle_table_button = ft.ElevatedButton(text="Mostrar Tabla", 
                                            on_click=lambda ignored_parameter: show_table(tb1.value, tb2.value, tb3.value, tb4.value, tb5.value))
