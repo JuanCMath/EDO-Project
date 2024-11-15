@@ -66,7 +66,7 @@ def precision_tester(derivative_as_string, x_condition, y_condition, h_step, amo
     first_index = np.where(x_exact == x_euler[0])[0][0]
     
     for i in range (n):
-        error_euler = abs(y_euler[i] - y_exact[first_index + i])
+        error_euler = abs(y_euler[i] - y_exact[first_index + i] )
         error_rk4 = abs(y_rk4[i] - y_exact[first_index + i])
 
         euler_errors.append(error_euler)
@@ -85,8 +85,8 @@ def precision_tester(derivative_as_string, x_condition, y_condition, h_step, amo
 
     # Agregar anotaciones de texto en la gráfica
     for step, euler_error, rk4_error in zip(steps, euler_errors, rk4_errors):
-        ax.text(step, rk4_error, f'{float(rk4_error):.2e}', fontsize=10, va='bottom', ha='center', color='red')
-        ax.text(step, euler_error, f'{float(euler_error):.2e}', fontsize=10, va='top', ha='center', color='blue')
+        ax.text(step, rk4_error, f'{float(rk4_error):.2e}', fontsize=5, va='bottom', ha='center', color='red')
+        ax.text(step, euler_error, f'{float(euler_error):.2e}', fontsize=5, va='top', ha='center', color='blue')
 
 
 def validate_inputs(*inputs):
@@ -192,6 +192,7 @@ def main(page: ft.Page):
 
         first_index = np.where(x_exact == x_euler[0])[0][0]
 
+        
         for i in range(n):
             error_euler = abs(y_euler[i] - y_exact[first_index + i])
             error_rk4 = abs(y_rk4[i] - y_exact[first_index + i])
@@ -199,6 +200,12 @@ def main(page: ft.Page):
             euler_errors.append(error_euler)
             rk4_errors.append(error_rk4)
             steps.append(x_val + h * i)
+
+        print(y_exact[first_index + 0])
+        print(y_euler[0])
+        print(y_rk4[0])
+        print(y_exact)
+
 
         table_rows = [
             ft.DataRow(cells=[

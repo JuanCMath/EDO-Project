@@ -65,6 +65,6 @@ def exact_solution(f, x0, y0, step):
     C_value = sp.solve(particular_sol.rhs.subs(x, x0) - y0, C)[0]
     particular_sol = particular_sol.subs(C, C_value)
     
-    y_values = [particular_sol.rhs.subs(x, val).evalf() for val in x_values]
+    y_values = [round(particular_sol.rhs.subs(x, val).evalf(), 5) for val in x_values]
     
     return x_values, y_values
