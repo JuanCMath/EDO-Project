@@ -182,9 +182,9 @@ def main(page: ft.Page):
                 ft.DataCell(ft.Text(f"{step:.2f}")),
                 ft.DataCell(ft.Text(f"{float(y_exact[first_index + i]):.2f}")),
                 ft.DataCell(ft.Text(f"{float(y_euler[i]):.2f}")),
-                ft.DataCell(ft.Text(f"{float(y_rk4[i])::.2f}")),
-                ft.DataCell(ft.Text(f"{float(euler_errors[i])::.2e}")),
-                ft.DataCell(ft.Text(f"{float(rk4_errors[i])::.2e}")),
+                ft.DataCell(ft.Text(f"{float(y_rk4[i]):.2f}")),
+                ft.DataCell(ft.Text(f"{float(euler_errors[i]):.2e}")),
+                ft.DataCell(ft.Text(f"{float(rk4_errors[i]):.2e}")),
             ]) for i, step in enumerate(steps)
         ]
 
