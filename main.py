@@ -163,8 +163,6 @@ def main(page: ft.Page):
         rk4_errors = []
         steps = []
 
-        print(x_exact)
-        print(x_euler)
         #Calculamos en que indice tenemos que empezar a comparar, 
         #(la solucion exacta toma valores -25 <= x <= 25 mientras que los metodos analiticos el usario elige un valor entre esos numeros)
         for i in range(len(x_exact)):
