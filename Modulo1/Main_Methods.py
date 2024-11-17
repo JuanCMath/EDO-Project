@@ -73,7 +73,7 @@ def precision_tester(derivative_as_string, x_condition, y_condition, h_step, amo
     """
     x, y = sp.symbols('x y')
     user_function = sp.sympify(derivative_as_string)
-    f = sp.lambdify((x, y), user_function, 'numpy')
+    f = sp.lambdify((x, y), user_function, modules=['sympy'])
 
     euler_errors = []
     rk4_errors = []
