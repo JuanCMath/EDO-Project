@@ -1,7 +1,5 @@
 import numpy as np  # Librería para operaciones matemáticas y manejo de arreglos
-from scipy.integrate import odeint  # Función para integrar ecuaciones diferenciales
 import sympy as sp  # Librería para operaciones simbólicas
-import inspect  # Librería para obtener información sobre objetos en tiempo de ejecución
 
 def euler_improved(f, x0, y0, h, n):
     """
@@ -62,7 +60,7 @@ def runge_kutta_4(f, x0, y0, h, n):
     
     return x_values, y_values
 
-def plot_isoclines(f, x_range, y_range, num_points=30):
+def calculate_isoclines(f, x_range, y_range, num_points=30):
     """
     Calcula y grafica las isoclinas de una EDO.
 

@@ -1,9 +1,8 @@
 import flet as ft  # Libreria Para crear aplicaciones web
 import matplotlib.pyplot as plt  # Libreria para plotear
-import numpy as np  # Libreria para usar operaciones matematicas
 import sympy as sp  # Libreria para manejar operaciones simbolicas
 from flet.matplotlib_chart import MatplotlibChart  # Componente Flet para usar gráficos de Matplotlib
-from Modulo1 import Resolution_Algorithms  # Custom module for numerical methods
+import Modulo1.Resolution_Algorithms  # Custom module for numerical methods
 from Modulo1.Main_Methods import plot_results, create_graph, plot_isoclines, precision_tester, validate_inputs  # Helper functions
 
 # Global figures and axes
@@ -49,9 +48,9 @@ def main(page: ft.Page):
         n = int(amount_of_steps_as_string)  
 
         # Resolver la EDO por los 3 metodos
-        t_values_exact, y_values_exact = Resolution_Algorithms.analitic_solution(f, x_val, y_val, h)
-        t_values_euler, y_values_euler = Resolution_Algorithms.euler_improved(f, x_val, y_val, h, n)
-        t_values_runge_kutta, y_values_runge_kutta = Resolution_Algorithms.runge_kutta_4(f, x_val, y_val, h, n)
+        t_values_exact, y_values_exact = Modulo1.Resolution_Algorithms.analitic_solution(f, x_val, y_val, h)
+        t_values_euler, y_values_euler = Modulo1.Resolution_Algorithms.euler_improved(f, x_val, y_val, h, n)
+        t_values_runge_kutta, y_values_runge_kutta = Modulo1.Resolution_Algorithms.runge_kutta_4(f, x_val, y_val, h, n)
 
         # Mostrar los resultados
         plot_results(ax, t_values_exact, y_values_exact, t_values_euler, y_values_euler, t_values_runge_kutta, y_values_runge_kutta)
@@ -153,9 +152,9 @@ def main(page: ft.Page):
         n = int(amount_of_steps_as_string)  # Convert the number of steps to int
 
         # Solucionar la EDO de todas las formas
-        x_exact, y_exact = Resolution_Algorithms.analitic_solution(f, x_val, y_val, h)
-        x_euler, y_euler = Resolution_Algorithms.euler_improved(f, x_val, y_val, h, n)
-        x_rk4, y_rk4 = Resolution_Algorithms.runge_kutta_4(f, x_val, y_val, h, n)
+        x_exact, y_exact = Modulo1.Resolution_Algorithms.analitic_solution(f, x_val, y_val, h)
+        x_euler, y_euler = Modulo1.Resolution_Algorithms.euler_improved(f, x_val, y_val, h, n)
+        x_rk4, y_rk4 = Modulo1.Resolution_Algorithms.runge_kutta_4(f, x_val, y_val, h, n)
 
 
         # Inicializacion de Arrays para guardar los errores
