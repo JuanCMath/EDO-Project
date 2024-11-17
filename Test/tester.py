@@ -24,7 +24,7 @@ def exact_solution(f, x0, y0, step):
 # Ejemplo de uso
 if __name__ == "__main__":
     x, y = sp.symbols('x y')
-    user_function = sp.sympify("sin(x - y)")
+    user_function = sp.sympify("sin(x + y)")
     f = sp.lambdify((x, y), user_function, modules=['sympy'])
 
     x0 = 0

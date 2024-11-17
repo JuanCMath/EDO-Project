@@ -47,17 +47,17 @@ def runge_kutta_4(f, x0, y0, h, n):
     y_values = [y0]
     
     for i in range(n):
-        t = x_values[-1]
+        x = x_values[-1]
         y = y_values[-1]
         
-        k1 = f(t, y)  # Calcula la pendiente en el punto inicial
-        k2 = f(t + h / 2, y + h * k1 / 2)  # Calcula la pendiente en el punto medio usando k1
-        k3 = f(t + h / 2, y + h * k2 / 2)  # Calcula la pendiente en el punto medio usando k2
-        k4 = f(t + h, y + h * k3)  # Calcula la pendiente en el punto final usando k3
+        k1 = f(x, y)  # Calcula la pendiente en el punto inicial
+        k2 = f(x + h / 2, y + h * k1 / 2)  # Calcula la pendiente en el punto medio usando k1
+        k3 = f(x + h / 2, y + h * k2 / 2)  # Calcula la pendiente en el punto medio usando k2
+        k4 = f(x + h, y + h * k3)  # Calcula la pendiente en el punto final usando k3
         
         y_next = y + (h / 6) * (k1 + 2 * k2 + 2 * k3 + k4)  # Calcula el valor de y en el siguiente paso
         
-        x_values.append(round(t + h, 3))  # Agrega el nuevo valor de x a la lista
+        x_values.append(round(x + h, 3))  # Agrega el nuevo valor de x a la lista
         y_values.append(y_next)  # Agrega el nuevo valor de y a la lista
     
     return x_values, y_values

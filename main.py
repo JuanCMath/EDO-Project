@@ -40,7 +40,7 @@ def main(page: ft.Page):
         # Convierte el string en una expresion simbolica
         user_function = sp.sympify(derivative_as_string)
         # Convierte la expresion simbolica en una funcion numerica evaluable
-        f = sp.lambdify((x, y), user_function, 'numpy')
+        f = sp.lambdify((x, y), user_function, modules=['sympy'])
 
         # Conversion de datos de las entradas
         x_val = float(x_condition_as_string)
@@ -77,7 +77,7 @@ def main(page: ft.Page):
         # Convierte el string entrante en una expresion simbolica
         user_function = sp.sympify(derivative_as_string)
         # Convierte la expresion simbolica en una funcion evaluable
-        f = sp.lambdify((x, y), user_function, 'numpy')
+        f = sp.lambdify((x, y), user_function, modules=['sympy'])
     
 
         plot_isoclines(ax, f) #Calcula el campo Direccional y lo muestra
