@@ -157,15 +157,19 @@ def main(page: ft.Page):
         x_euler, y_euler = Resolution_Algorithms.euler_improved(f, x_val, y_val, h, n)
         x_rk4, y_rk4 = Resolution_Algorithms.runge_kutta_4(f, x_val, y_val, h, n)
 
+
         # Inicializacion de Arrays para guardar los errores
         euler_errors = []
         rk4_errors = []
         steps = []
 
+        
         #Calculamos en que indice tenemos que empezar a comparar, 
         #(la solucion exacta toma valores -25 <= x <= 25 mientras que los metodos analiticos el usario elige un valor entre esos numeros)
-        first_index = np.where(x_exact == x_euler[0])[0][0]
-
+        for i in range(len(x_exact)):
+            if (x_exact[i] == x_euler[0]): 
+                first_index = i 
+                break
 
         #Calculamos los Errores Relativos a la solucion exacta de los metodos Euler y RK4
         for i in range(n):
@@ -210,6 +214,7 @@ def main(page: ft.Page):
         )
 
         graph_container.content = scrollable_table  # Añadiendo la tabla al Box
+
         page.update() # Refrescando la pagina
 
     # Crea los campos de entrada de Texto del usuario

@@ -18,16 +18,16 @@ def euler_improved(f, x0, y0, h, n):
     y_values = [y0]
 
     for i in range(n):
-        t = x_values[-1]
+        x = x_values[-1]
         y = y_values[-1]
 
-        k1 = f(t, y)
+        k1 = f(x, y)
         y_predict = y + h * k1
 
-        k2 = f(t + h, y_predict)
+        k2 = f(x + h, y_predict)
         y_corrected = y + (h / 2) * (k1 + k2)
 
-        x_values.append(t + h)
+        x_values.append(round(x + h, 3))
         y_values.append(y_corrected)
 
     return x_values, y_values
@@ -57,7 +57,7 @@ def runge_kutta_4(f, x0, y0, h, n):
         
         y_next = y + (h / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
         
-        x_values.append(t + h)
+        x_values.append(round(t + h, 3))
         y_values.append(y_next)
     
     return x_values, y_values
@@ -108,7 +108,14 @@ def analitic_solution(f, x0, y0, step):
     :param step: Tamaño del paso.
     :return: Tuple (x_values, y_values) con los valores de x e y calculados.
     """
-    x_values = np.arange(-25, 25 + step, step)
+    start = -25
+    x_values = [-25]
+
+    while (start < 25):
+        start += step
+        x_values.append(round(start, 3))
+    
+
     particular_sol = solve_edo(f, x0, y0)
     y_values = [round(particular_sol.rhs.subs(sp.symbols('x'), val).evalf(), 5) for val in x_values]
     return x_values, y_values

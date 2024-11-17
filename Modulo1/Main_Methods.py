@@ -88,7 +88,10 @@ def precision_tester(derivative_as_string, x_condition, y_condition, h_step, amo
     x_euler, y_euler = Resolution_Algorithms.euler_improved(f, current_x, y_condition, h_step, n)
     x_rk4, y_rk4 = Resolution_Algorithms.runge_kutta_4(f, current_x, y_condition, h_step, n)
 
-    first_index = np.where(x_exact == x_euler[0])[0][0]
+    for i in range(len(x_exact)):
+        if (x_exact[i] == x_euler[0]): 
+            first_index = i
+            break
     
     for i in range (n):
         error_euler = abs(y_euler[i] - y_exact[first_index + i] )
