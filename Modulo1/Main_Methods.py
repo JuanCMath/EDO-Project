@@ -88,18 +88,26 @@ def precision_tester(derivative_as_string, x_condition, y_condition, h_step, amo
     x_euler, y_euler = Resolution_Algorithms.euler_improved(f, current_x, y_condition, h_step, n)
     x_rk4, y_rk4 = Resolution_Algorithms.runge_kutta_4(f, current_x, y_condition, h_step, n)
 
+    print(x_exact)
+    print(x_euler)
+    print(x_rk4)
+    
     for i in range(len(x_exact)):
         if (x_exact[i] == x_euler[0]): 
             first_index = i
             break
+    print(first_index)
     
     for i in range (n):
-        error_euler = abs(y_euler[i] - y_exact[first_index + i] )
-        error_rk4 = abs(y_rk4[i] - y_exact[first_index + i])
+        if (first_index + i < len(y_exact)): 
+            error_euler = abs(y_euler[i] - y_exact[first_index + i] )
+            error_rk4 = abs(y_rk4[i] - y_exact[first_index + i])
 
-        euler_errors.append(error_euler)
-        rk4_errors.append(error_rk4)
-        steps.append(current_x + h_step * i)
+            euler_errors.append(error_euler)
+            rk4_errors.append(error_rk4)
+            steps.append(current_x + h_step * i)
+        else :
+            break
 
     # Graficar los errores
     ax.plot(steps, euler_errors, label='Error Método de Euler', color='blue', marker='o', linestyle='-', markersize=6)

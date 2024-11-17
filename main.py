@@ -172,12 +172,15 @@ def main(page: ft.Page):
 
         #Calculamos los Errores Relativos a la solucion exacta de los metodos Euler y RK4
         for i in range(n):
-            error_euler = abs(y_euler[i] - y_exact[first_index + i])
-            error_rk4 = abs(y_rk4[i] - y_exact[first_index + i])
+            if (first_index + i <  len(y_exact)):
+                error_euler = abs(y_euler[i] - y_exact[first_index + i])
+                error_rk4 = abs(y_rk4[i] - y_exact[first_index + i])
 
-            euler_errors.append(error_euler)
-            rk4_errors.append(error_rk4)
-            steps.append(x_val + h * i)
+                euler_errors.append(error_euler)
+                rk4_errors.append(error_rk4)
+                steps.append(x_val + h * i)
+            else:
+                break
 
         # Creacion de la tabla con los resultados
         table_rows = [
