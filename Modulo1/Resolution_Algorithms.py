@@ -1,9 +1,13 @@
 import numpy as np
+from decimal import Decimal, getcontext 
 
 from scipy.integrate import odeint
 import sympy as sp
 import inspect
+#TODO : Si quieren volver a como estaban simplemente borren la libreria decimal con el getcontext y quitenle a los valores el decimal
 
+# Establecer precisión (por ejemplo, 28 dígitos decimales)  
+getcontext().prec = 120
 
 def euler_improved(f, x0, y0, h, n):
 
@@ -35,21 +39,21 @@ def euler_improved(f, x0, y0, h, n):
 
     """
     #guarda los valores de X0,Y0 en un array
-    x_values = [x0]
-    y_values = [y0]
+    x_values = [Decimal(x0)]
+    y_values = [Decimal(y0)]
     #Casteo del valor de h a decimal
     h_2 = Decimal(h)
     for i in range(n):
         #Declaración de los valores iniciales de Xn,Yn
-        x = x_values[-1]
-        y = y_values[-1]
+        x = Decimal(x_values[-1])
+        y = Decimal(y_values[-1])
         #Calculo de la primera pendiente K1 con los valores iniciales Xn,Yn
-        k1 = f(x, y)
+        k1 = Decimal(f(x, y))
         #Calculo de la segunda pendiente con los valores de y,h,K1
-        u = y + Decimal(h_2) * k1
-        k2 = f(x + h_2, u)
+        u = Decimal(y + Decimal(h_2) * k1)
+        k2 = Decimal(f(x + h_2, u))
         #Promedio de las pendientes para asegurar una mejor precición 
-        y_corrected = y + (h_2 / Decimal(2)) * (k1 + k2)
+        y_corrected = Decimal(y + (h_2 / Decimal(2)) * (k1 + k2))
         #Valores agregados
         x_values.append(float(x + h_2))
         y_values.append(float(y_corrected))
