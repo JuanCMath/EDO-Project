@@ -1,6 +1,6 @@
 import numpy as np
 import sympy as sp
-from Modulo1 import Resolution_Algorithms
+from . import Resolution_Algorithms
 
 def plot_results(ax, t_values_exact, y_values_exact, t_values_euler, y_values_euler, t_values_runge_kutta, y_values_runge_kutta):
     """
@@ -49,7 +49,7 @@ def plot_isoclines(ax, f):
     :param ax: Ejes de Matplotlib donde se graficarán las isoclinas.
     :param f: Función que representa la derivada de la EDO.
     """
-    t, y, u, v = Resolution_Algorithms.plot_isoclines(f, (-25, 25), (-25, 25))
+    t, y, u, v = Resolution_Algorithms.calculate_isoclines(f, (-25, 25), (-25, 25))
     ax.quiver(t, y, u, v, color='gray', alpha=0.5)
     ax.set_xlabel("x")
     ax.set_ylabel("y")
