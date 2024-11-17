@@ -108,13 +108,21 @@ def analitic_solution(f, x0, y0, step):
     :param step: Tamaño del paso.
     :return: Tuple (x_values, y_values) con los valores de x e y calculados.
     """
-    start = -25
-    x_values = [-25]
 
-    while (start < 25):
-        start += step
-        x_values.append(round(start, 3))
+    x_values = [x0]
+    helper = x0
+
+    while (helper > -25):
+        helper -= step
+        x_values.append(round(helper, 3))
+
+    helper = x0
+
+    while (helper < 25):
+        helper += step
+        x_values.append(round(helper, 3))
     
+    x_values.sort()
 
     particular_sol = solve_edo(f, x0, y0)
     y_values = [round(particular_sol.rhs.subs(sp.symbols('x'), val).evalf(), 5) for val in x_values]
