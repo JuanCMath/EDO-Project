@@ -48,12 +48,12 @@ def main(page: ft.Page):
         n = int(amount_of_steps_as_string)  
 
         # Resolver la EDO por los 3 metodos
-        t_values_exact, y_values_exact = Modulo1.Resolution_Algorithms.analitic_solution(f, x_val, y_val, h)
-        t_values_euler, y_values_euler = Modulo1.Resolution_Algorithms.euler_improved(f, x_val, y_val, h, n)
-        t_values_runge_kutta, y_values_runge_kutta = Modulo1.Resolution_Algorithms.runge_kutta_4(f, x_val, y_val, h, n)
+        x_values_exact, y_values_exact = Modulo1.Resolution_Algorithms.analitic_solution(f, x_val, y_val, h)
+        x_values_euler, y_values_euler = Modulo1.Resolution_Algorithms.euler_improved(f, x_val, y_val, h, n)
+        x_values_runge_kutta, y_values_runge_kutta = Modulo1.Resolution_Algorithms.runge_kutta_4(f, x_val, y_val, h, n)
 
         # Mostrar los resultados
-        plot_results(ax, t_values_exact, y_values_exact, t_values_euler, y_values_euler, t_values_runge_kutta, y_values_runge_kutta)
+        plot_results(ax, x_values_exact, y_values_exact, x_values_euler, y_values_euler, x_values_runge_kutta, y_values_runge_kutta)
         graph_container.content = MatplotlibChart(fig, expand=True)  # Actualizar la grafica del Box
         page.update()  #Updatear la pagina para que se muestre la tabla
 
