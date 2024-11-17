@@ -38,6 +38,7 @@ def euler_improved(f, x0, y0, h, n):
     x_values = [x0]
     y_values = [y0]
     #Casteo del valor de h a decimal
+    h_2 = Decimal(h)
     for i in range(n):
         #Declaración de los valores iniciales de Xn,Yn
         x = x_values[-1]
@@ -45,12 +46,12 @@ def euler_improved(f, x0, y0, h, n):
         #Calculo de la primera pendiente K1 con los valores iniciales Xn,Yn
         k1 = f(x, y)
         #Calculo de la segunda pendiente con los valores de y,h,K1
-        u = y + h * k1
-        k2 = f(x + h, u)
+        u = y + Decimal(h_2) * k1
+        k2 = f(x + h_2, u)
         #Promedio de las pendientes para asegurar una mejor precición 
-        y_corrected = y + (h / 2) * (k1 + k2)
+        y_corrected = y + (h_2 / Decimal(2)) * (k1 + k2)
         #Valores agregados
-        x_values.append(float(x + h))
+        x_values.append(float(x + h_2))
         y_values.append(float(y_corrected))
 
     return x_values, y_values
