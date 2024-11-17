@@ -143,7 +143,7 @@ def main(page: ft.Page):
         # Convierte el string a una expresion simbolica
         user_function = sp.sympify(derivative_as_string)
         # Convierte una expresion simbolica en una funcion evaluable
-        f = sp.lambdify((x, y), user_function, 'numpy')
+        f = sp.lambdify((x, y), user_function, modules=['sympy'])
 
         # Casteando las entradas en tipos de datos necesarios
         x_val = float(x_condition_as_string)
