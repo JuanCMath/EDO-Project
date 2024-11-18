@@ -136,11 +136,33 @@ def validate_inputs(*inputs):
     except sp.SympifyError:
         return False, "Invalid mathematical function in f(x,y)."
     
-    for i, inp in enumerate(inputs[1:], start=1):
-        try:
-            float(inp)  
-        except ValueError:
-            return False, f"Invalid numerical input in field {i}."
+    try:
+        x_condition = float(inputs[1])
+        if not (-25 <= x_condition <= 25):
+            return False, "x_condition must be a float between -25 and 25."
+    except ValueError:
+        return False, "Invalid numerical input in x_condition."
+    
+    try:
+        y_condition = float(inputs[2])
+        if not (-25 <= y_condition <= 25):
+            return False, "y_condition must be a float between -25 and 25."
+    except ValueError:
+        return False, "Invalid numerical input in y_condition."
+    
+    try:
+        h_step = float(inputs[3])
+        if h_step <= 0:
+            return False, "h_step must be a positive float."
+    except ValueError:
+        return False, "Invalid numerical input in h_step."
+    
+    try:
+        amount_of_steps = int(inputs[4])
+        if amount_of_steps <= 0:
+            return False, "amount_of_steps must be a positive integer."
+    except ValueError:
+        return False, "Invalid numerical input in amount_of_steps."
     
     return True, ""
 

@@ -125,7 +125,7 @@ def main(page: ft.Page):
         :param h_step_as_string: Tamaño del paso.
         :param amount_of_steps_as_string: Número de pasos.
         """
-        
+        ax.clear()
         # Valida las entradas
         is_valid, error_message = validate_inputs(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string)
         if not is_valid:
