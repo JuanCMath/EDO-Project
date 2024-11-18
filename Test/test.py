@@ -1,1 +1,1 @@
-round(print(-2 - 2*(2/(2 - 2.0))))
+print(True == False)

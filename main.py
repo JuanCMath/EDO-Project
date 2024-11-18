@@ -2,8 +2,9 @@ import flet as ft  # Libreria Para crear aplicaciones web
 import matplotlib.pyplot as plt  # Libreria para plotear
 import sympy as sp  # Libreria para manejar operaciones simbolicas
 from flet.matplotlib_chart import MatplotlibChart  # Componente Flet para usar gráficos de Matplotlib
-import Modulo1.Resolution_Algorithms  # Custom module for numerical methods
-from Modulo1.Main_Methods import plot_results, create_graph, plot_isoclines, precision_tester, validate_inputs  # Helper functions
+import Modulo1.Main_Methods
+import Modulo1.Resolution_Algorithms # Custom module for numerical methods
+from Modulo1.Main_Methods import plot_results, create_graph, plot_isoclines, precision_tester, validate_inputs, inputs_changed # Helper functions
 
 # Global figures and axes
 fig, ax = plt.subplots()  # Crea una nueva figura y ejes para plotear
@@ -15,7 +16,7 @@ def main(page: ft.Page):
     :param page: Página de Flet donde se mostrará la aplicación.
     """
     page.title = "Calculador de Ecuaciones Diferenciales Ordinarias de 1er grado"  # Titulo de la aplicacioon
-
+    
     #Metodo que  resuelve la EDO y grafica sus 3 soluciones en la aplicacion
     def solving(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
         """
@@ -27,6 +28,7 @@ def main(page: ft.Page):
         :param h_step_as_string: Tamaño del paso.
         :param amount_of_steps_as_string: Número de pasos.
         """
+        
         # Verifica que sean validas las entradas
         is_valid, error_message = validate_inputs(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string)
         if not is_valid:
@@ -65,12 +67,13 @@ def main(page: ft.Page):
             page.update()  #Updatear la pagina para que se muestre la tabla
 
 
-    def on_graphing_click(derivative_as_string):
+    def on_graphing_click(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
         """
         Grafica el campo direccional de la EDO.
 
         :param derivative_as_string: Derivada de la EDO en formato de cadena.
         """
+
         # Verifica si las entradas son validas
         is_valid, error_message = validate_inputs(derivative_as_string)
         if not is_valid:
@@ -85,18 +88,6 @@ def main(page: ft.Page):
         graph_container.content = MatplotlibChart(fig, expand=True)  #Actualiza el contenido del Box
         page.update() #Refresca la pagina para que se muestr el resultado
 
-
-    #Resetea la vista de la pagina para empezar de 0 en todos los graficos
-    def reset_graph():
-        """
-        Resetea la vista de la página para empezar de cero en todos los gráficos.
-        """
-        ax.clear()  # Limpia los ejes
-        create_graph(ax)  # Crea un nuevo grafico
-        graph_container.content = MatplotlibChart(fig, expand=True)  # Actualiza el contenido
-        page.update() # Refresca la pagina
-
-
     #Muestra usando funciones continuas como se incrementa la diferencia entre los errores producidos por Euler y RK4
     def show_precision_tester(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
         """
@@ -108,19 +99,20 @@ def main(page: ft.Page):
         :param h_step_as_string: Tamaño del paso.
         :param amount_of_steps_as_string: Número de pasos.
         """
+        ax.clear()
         # Valida las entradas
         is_valid, error_message = validate_inputs(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string)
         if not is_valid:
             page.snack_bar = ft.SnackBar(ft.Text(error_message), open=True)  # Show an error message
             page.update()
             return
-        
 
-        ax.clear()  # Limpia los ejes
+
         # Calcula los errores y los muestra
         precision_tester(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string, ax)
         graph_container.content = MatplotlibChart(fig, expand=True)  # Actualiza el Box
         page.update() #Refresca la pagina
+
 
     #Muestra la tabla de soluciones para el metodo analitico y los 2 numericos junto a los errores cometidos
     def show_table(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
@@ -133,6 +125,7 @@ def main(page: ft.Page):
         :param h_step_as_string: Tamaño del paso.
         :param amount_of_steps_as_string: Número de pasos.
         """
+        
         # Valida las entradas
         is_valid, error_message = validate_inputs(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string)
         if not is_valid:
@@ -159,71 +152,95 @@ def main(page: ft.Page):
         x_rk4, y_rk4 = Modulo1.Resolution_Algorithms.runge_kutta_4(f, x_val, y_val, h, n)
 
         if(x_exact == False): #Si no se pudo resolver la EDO con los metodos numericos, se muestra un mensaje de error
-            page.snack_bar = ft.SnackBar(ft.Text(y_exact), open=True)
-            """
-            TODO Comparar solo los graficos de las otras soluciones
-            """    
+
+            # Creacion de la tabla con los resultados
+            table_rows = [
+                ft.DataRow(cells=[
+                    ft.DataCell(ft.Text(f"{x_euler[i]:.2f}")),
+                    ft.DataCell(ft.Text(f"{float(y_euler[i]):.2f}")),
+                    ft.DataCell(ft.Text(f"{float(y_rk4[i]):.2f}"))
+               ]) for i in range(len(x_euler))
+            ]
+
+            # Creacion de la tabla en la aplicacion
+            table = ft.DataTable(
+                columns=[
+                    ft.DataColumn(ft.Text("X Values")),
+                    ft.DataColumn(ft.Text("Euler Solution")),
+                    ft.DataColumn(ft.Text("RK4 Solution")),
+                ],
+                rows=table_rows,
+            )
+
+            # Haciendo posible que la tabla tenga un scrollbar
+            scrollable_table = ft.ListView(
+                controls=[table],
+                auto_scroll=True,
+                width=1000,
+                height=700
+            )
+        else:
         # Inicializacion de Arrays para guardar los errores
-        euler_errors = []
-        rk4_errors = []
-        steps = []
+            euler_errors = []
+            rk4_errors = []
+            steps = []
 
-        #Calculamos en que indice tenemos que empezar a comparar, 
-        #(la solucion exacta toma valores -25 <= x <= 25 mientras que los metodos analiticos el usario elige un valor entre esos numeros)
-        for i in range(len(x_exact)):
-            if (x_exact[i] == x_euler[0]): 
-                first_index = i 
-                break
+            #Calculamos en que indice tenemos que empezar a comparar, 
+            #(la solucion exacta toma valores -25 <= x <= 25 mientras que los metodos analiticos el usario elige un valor entre esos numeros)
+            for i in range(len(x_exact)):
+                if (x_exact[i] == x_euler[0]): 
+                    first_index = i 
+                    break
 
-        #Calculamos los Errores Relativos a la solucion exacta de los metodos Euler y RK4
-        for i in range(n):
-            if (first_index + i <  len(y_exact)):
-                error_euler = abs(y_euler[i] - y_exact[first_index + i])
-                error_rk4 = abs(y_rk4[i] - y_exact[first_index + i])
+            #Calculamos los Errores Relativos a la solucion exacta de los metodos Euler y RK4
+            for i in range(n):
+                if (first_index + i <  len(y_exact)):
+                    error_euler = abs(y_euler[i] - y_exact[first_index + i])
+                    error_rk4 = abs(y_rk4[i] - y_exact[first_index + i])
 
-                euler_errors.append(error_euler)
-                rk4_errors.append(error_rk4)
-                steps.append(x_val + h * i)
-            else:
-                break
+                    euler_errors.append(error_euler)
+                    rk4_errors.append(error_rk4)
+                    steps.append(x_val + h * i)
+                else:
+                    break
 
-        # Creacion de la tabla con los resultados
-        table_rows = [
-            ft.DataRow(cells=[
-                ft.DataCell(ft.Text(f"{step:.2f}")),
-                ft.DataCell(ft.Text(f"{float(y_exact[first_index + i]):.2f}")),
-                ft.DataCell(ft.Text(f"{float(y_euler[i]):.2f}")),
-                ft.DataCell(ft.Text(f"{float(y_rk4[i]):.2f}")),
-                ft.DataCell(ft.Text(f"{float(euler_errors[i]):.2e}")),
-                ft.DataCell(ft.Text(f"{float(rk4_errors[i]):.2e}")),
-            ]) for i, step in enumerate(steps)
-        ]
+            # Creacion de la tabla con los resultados
+            table_rows = [
+                ft.DataRow(cells=[
+                    ft.DataCell(ft.Text(f"{step:.2f}")),
+                    ft.DataCell(ft.Text(f"{float(y_exact[first_index + i]):.2f}")),
+                    ft.DataCell(ft.Text(f"{float(y_euler[i]):.2f}")),
+                    ft.DataCell(ft.Text(f"{float(y_rk4[i]):.2f}")),
+                    ft.DataCell(ft.Text(f"{float(euler_errors[i]):.2e}")),
+                    ft.DataCell(ft.Text(f"{float(rk4_errors[i]):.2e}")),
+                ]) for i, step in enumerate(steps)
+            ]
 
         # Creacion de la tabla en la aplicacion
-        table = ft.DataTable(
-            columns=[
-                ft.DataColumn(ft.Text("X Values")),
-                ft.DataColumn(ft.Text("Exact Solution")),
-                ft.DataColumn(ft.Text("Euler Solution")),
-                ft.DataColumn(ft.Text("RK4 Solution")),
-                ft.DataColumn(ft.Text("Euler Error")),
-                ft.DataColumn(ft.Text("RK4 Error")),
-            ],
-            rows=table_rows,
-        )
+            table = ft.DataTable(
+                columns=[
+                    ft.DataColumn(ft.Text("X Values")),
+                    ft.DataColumn(ft.Text("Exact Solution")),
+                    ft.DataColumn(ft.Text("Euler Solution")),
+                    ft.DataColumn(ft.Text("RK4 Solution")),
+                    ft.DataColumn(ft.Text("Euler Error")),
+                    ft.DataColumn(ft.Text("RK4 Error")),
+                ],
+                rows=table_rows,
+            )
 
-        # Haciendo posible que la tabla tenga un scrollbar
-        scrollable_table = ft.ListView(
-            controls=[table],
-            auto_scroll=True,
-            width=1000,
-            height=700
-        )
+            # Haciendo posible que la tabla tenga un scrollbar
+            scrollable_table = ft.ListView(
+                controls=[table],
+                auto_scroll=True,
+                width=1000,
+                height=700
+            )
 
         graph_container.content = scrollable_table  # Añadiendo la tabla al Box
 
         page.update() # Refrescando la pagina
-
+        
     # Crea los campos de entrada de Texto del usuario
     tb1 = ft.TextField(label="f(x,y)", width=400)
     tb2 = ft.TextField(label="x0", width=400)
@@ -236,10 +253,8 @@ def main(page: ft.Page):
                                        on_click = lambda ignored_parameter: solving(tb1.value, tb2.value, tb3.value, tb4.value, tb5.value))
 
     graphing_button = ft.ElevatedButton(text="Graficar", 
-                                        on_click = lambda ignored_parameter: on_graphing_click(tb1.value))
+                                        on_click = lambda ignored_parameter: on_graphing_click(tb1.value, tb2.value, tb3.value, tb4.value, tb5.value))
 
-    reset_button = ft.ElevatedButton(text="Reset", 
-                                     on_click=lambda ignored_parameter: reset_graph())
 
     precision_button = ft.ElevatedButton(text="Mostrar Precisión", 
                                          on_click=lambda ignored_parameter: show_precision_tester(tb1.value, float(tb2.value), float(tb3.value), float(tb4.value), float(tb5.value)))
@@ -251,7 +266,7 @@ def main(page: ft.Page):
     graph_container = ft.Container(width=1000, height=700, alignment=ft.alignment.center)
 
     # Crea una columna para los campos de entrada y botones
-    input_column = ft.Column([tb1, tb2, tb3, tb4, tb5, solving_button, graphing_button,  precision_button, toggle_table_button, reset_button], 
+    input_column = ft.Column([tb1, tb2, tb3, tb4, tb5, solving_button, graphing_button,  precision_button, toggle_table_button], 
                              width=300, spacing=10)
 
     # Crea un Box principal donde va a ir todo lo anterior para mostrarse en pantalla

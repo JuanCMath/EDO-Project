@@ -88,30 +88,30 @@ def precision_tester(derivative_as_string, x_condition, y_condition, h_step, amo
     x_euler, y_euler = Resolution_Algorithms.euler_improved(f, current_x, y_condition, h_step, n)
     x_rk4, y_rk4 = Resolution_Algorithms.runge_kutta_4(f, current_x, y_condition, h_step, n)
 
-    print(x_exact)
-    print(x_euler)
-    print(x_rk4)
+    if(x_exact == False):
+        ax.plot(x_euler, y_euler, label='Solucion Método de Euler', color='blue', marker='o', linestyle='-', markersize=6)
+        ax.plot(x_euler, y_rk4, label='Solucion Método RK4', color='red', marker='s', linestyle='--', markersize=6)
+    else: 
+        for i in range(len(x_exact)):
+            if (x_exact[i] == x_euler[0]): 
+                first_index = i
+                break
     
-    for i in range(len(x_exact)):
-        if (x_exact[i] == x_euler[0]): 
-            first_index = i
-            break
-    print(first_index)
+        for i in range (n):
+            if (first_index + i < len(y_exact)): 
+                error_euler = abs(y_euler[i] - y_exact[first_index + i] )
+                error_rk4 = abs(y_rk4[i] - y_exact[first_index + i])
+
+                euler_errors.append(error_euler)
+                rk4_errors.append(error_rk4)
+                steps.append(current_x + h_step * i)
+            else :
+                break
+        # Graficar los errores
+        ax.plot(steps, euler_errors, label='Error Método de Euler', color='blue', marker='o', linestyle='-', markersize=6)
+        ax.plot(steps, rk4_errors, label='Error Método RK4', color='red', marker='s', linestyle='--', markersize=6)
+
     
-    for i in range (n):
-        if (first_index + i < len(y_exact)): 
-            error_euler = abs(y_euler[i] - y_exact[first_index + i] )
-            error_rk4 = abs(y_rk4[i] - y_exact[first_index + i])
-
-            euler_errors.append(error_euler)
-            rk4_errors.append(error_rk4)
-            steps.append(current_x + h_step * i)
-        else :
-            break
-
-    # Graficar los errores
-    ax.plot(steps, euler_errors, label='Error Método de Euler', color='blue', marker='o', linestyle='-', markersize=6)
-    ax.plot(steps, rk4_errors, label='Error Método RK4', color='red', marker='s', linestyle='--', markersize=6)
     ax.set_yscale('log')
     ax.set_xlabel('Paso h')
     ax.set_ylabel('Error')
@@ -143,3 +143,38 @@ def validate_inputs(*inputs):
             return False, f"Invalid numerical input in field {i}."
     
     return True, ""
+
+
+# Variables globales para almacenar las últimas entradas
+last_inputs = {
+    "derivative": None,
+    "x_condition": None,
+    "y_condition": None,
+    "h_step": None,
+    "amount_of_steps": None
+}
+
+def inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
+    """
+    Verifica si las entradas han cambiado con respecto a las últimas entradas.
+
+    :param derivative_as_string: Derivada de la EDO en formato de cadena.
+    :param x_condition_as_string: Condición inicial para x.
+    :param y_condition_as_string: Condición inicial para y.
+    :param h_step_as_string: Tamaño del paso.
+    :param amount_of_steps_as_string: Número de pasos.
+    :return: True si las entradas han cambiado, False en caso contrario.
+    """
+    global last_inputs
+    current_inputs = {
+        "derivative": derivative_as_string,
+        "x_condition": x_condition_as_string,
+        "y_condition": y_condition_as_string,
+        "h_step": h_step_as_string,
+        "amount_of_steps": amount_of_steps_as_string
+    }
+    if current_inputs == last_inputs:
+        return False
+    
+    last_inputs = current_inputs
+    return True
