@@ -60,23 +60,34 @@ def runge_kutta_4(f, x0, y0, h, n):
     
     return x_values, y_values
 
-def calculate_isoclines(f, x_range, y_range, num_points=30):
+def calculate_isoclines(f_sympy, x_range, y_range, num_points=30):
     """
     Calcula y grafica las isoclinas de una EDO.
 
-    :param f: Función que representa la derivada de la EDO.
+    :param f_sympy: Función simbólica que representa la derivada de la EDO.
     :param x_range: Rango de valores para x.
     :param y_range: Rango de valores para y.
     :param num_points: Número de puntos para la malla.
-    :return: Tuple (t, y, u, v) con los valores calculados para graficar las isoclinas.
+    :return: Tuple (x, y, u, v) con los valores calculados para graficar las isoclinas.
     """
-    x, y = np.meshgrid(np.linspace(x_range[0], x_range[1], num_points), np.linspace(y_range[0], y_range[1], num_points))  # Crea una malla de puntos
-    f = f(x, y)  # Evalúa la función en cada punto de la malla
+    # Define las variables simbólicas
+    x, y = sp.symbols('x y')
 
-    u = np.ones_like(f)  # Crea una matriz de unos con la misma forma que f
-    v = f / np.sqrt(1 + f**2)  # Normaliza los valores de f para obtener las direcciones de las isoclinas
+    # Crea una malla de puntos
+    x_vals, y_vals = np.meshgrid(np.linspace(x_range[0], x_range[1], num_points), np.linspace(y_range[0], y_range[1], num_points))
 
-    return x, y, u, v
+    # Evalúa la función simbólica en cada punto de la malla
+    f_vals = np.zeros_like(x_vals, dtype=float)
+    for i in range(x_vals.shape[0]):
+        for j in range(x_vals.shape[1]):
+            f_vals[i, j] = float(f_sympy.subs({x: x_vals[i, j], y: y_vals[i, j]}))
+
+    # Crea una matriz de unos con la misma forma que f_vals
+    u = np.ones_like(f_vals)
+    # Normaliza los valores de f para obtener las direcciones de las isoclinas
+    v = f_vals / np.sqrt(1 + f_vals**2)
+
+    return x_vals, y_vals, u, v
 
 def solve_edo(f, x0, y0):
     """
@@ -92,7 +103,7 @@ def solve_edo(f, x0, y0):
     edo = sp.Eq(y.diff(x), f(x, y))  # Crea la ecuación diferencial
     try:
         sol = sp.dsolve(edo, y)  # Intenta resolver la ecuación diferencial
-    except NotImplementedError:
+    except Exception:
         return False  # Retorna False si no se puede resolver
     
     C = sp.symbols('C')  # Define el símbolo de la constante de integración
@@ -133,5 +144,17 @@ def analitic_solution(f, x0, y0, step):
     if(particular_sol is bool and not particular_sol):# Retorna un mensaje de error si no se encuentra solución
         return False, "No se pudo encontrar una solución analítica para la EDO."  
     
-    y_values = [round(particular_sol.rhs.subs(sp.symbols('x'), val).evalf(), 5) for val in x_values]  # Calcula los valores de y
-    return x_values, y_values  # Retorna los valores de x e y
+    y_values = []
+    valid_x_values = []
+    for val in x_values:
+        try:
+            y_val = particular_sol.rhs.subs(sp.symbols('x'), val).evalf()
+            if y_val.is_real:
+                y_values.append(round(y_val, 5))
+                valid_x_values.append(val)
+            else:
+                print(f"Error: La función no está definida en x = {val}")
+        except Exception as e:
+            print(f"Error: Funcion {particular_sol} no definida en x = {val}")
+    
+    return valid_x_values, y_values  # Retorna los valores de x e y válidos
