@@ -52,10 +52,17 @@ def main(page: ft.Page):
         x_values_euler, y_values_euler = Modulo1.Resolution_Algorithms.euler_improved(f, x_val, y_val, h, n)
         x_values_runge_kutta, y_values_runge_kutta = Modulo1.Resolution_Algorithms.runge_kutta_4(f, x_val, y_val, h, n)
 
-        # Mostrar los resultados
-        plot_results(ax, x_values_exact, y_values_exact, x_values_euler, y_values_euler, x_values_runge_kutta, y_values_runge_kutta)
-        graph_container.content = MatplotlibChart(fig, expand=True)  # Actualizar la grafica del Box
-        page.update()  #Updatear la pagina para que se muestre la tabla
+        if(x_values_exact == False): #Si no se pudo resolver la EDO con los metodos numericos, se muestra un mensaje de error
+            page.snack_bar = ft.SnackBar(ft.Text(y_values_exact), open=True)
+            # Mostrar los resultados sin la solucion exacta
+            plot_results(ax, [], [], x_values_euler, y_values_euler, x_values_runge_kutta, y_values_runge_kutta)
+            graph_container.content = MatplotlibChart(fig, expand=True)  # Actualizar la grafica del Box
+            page.update()  #Updatear la pagina para que se muestre la tabla
+        else:
+            # Mostrar los resultados
+            plot_results(ax, x_values_exact, y_values_exact, x_values_euler, y_values_euler, x_values_runge_kutta, y_values_runge_kutta)
+            graph_container.content = MatplotlibChart(fig, expand=True)  # Actualizar la grafica del Box
+            page.update()  #Updatear la pagina para que se muestre la tabla
 
 
     def on_graphing_click(derivative_as_string):
@@ -151,7 +158,11 @@ def main(page: ft.Page):
         x_euler, y_euler = Modulo1.Resolution_Algorithms.euler_improved(f, x_val, y_val, h, n)
         x_rk4, y_rk4 = Modulo1.Resolution_Algorithms.runge_kutta_4(f, x_val, y_val, h, n)
 
-
+        if(x_exact == False): #Si no se pudo resolver la EDO con los metodos numericos, se muestra un mensaje de error
+            page.snack_bar = ft.SnackBar(ft.Text(y_exact), open=True)
+            """
+            TODO Comparar solo los graficos de las otras soluciones
+            """    
         # Inicializacion de Arrays para guardar los errores
         euler_errors = []
         rk4_errors = []

@@ -60,7 +60,7 @@ def runge_kutta_4(f, x0, y0, h, n):
     
     return x_values, y_values
 
-def calculate_isoclines(f_sympy, x_range, y_range, num_points=30):
+def calculate_isoclines(f, x_range, y_range, num_points=30):
     """
     Calcula y grafica las isoclinas de una EDO.
 
@@ -80,7 +80,7 @@ def calculate_isoclines(f_sympy, x_range, y_range, num_points=30):
     f_vals = np.zeros_like(x_vals, dtype=float)
     for i in range(x_vals.shape[0]):
         for j in range(x_vals.shape[1]):
-            f_vals[i, j] = float(f_sympy.subs({x: x_vals[i, j], y: y_vals[i, j]}))
+            f_vals[i, j] = float(f.subs({x: x_vals[i, j], y: y_vals[i, j]}))
 
     # Crea una matriz de unos con la misma forma que f_vals
     u = np.ones_like(f_vals)
@@ -141,9 +141,10 @@ def analitic_solution(f, x0, y0, step):
 
     particular_sol = solve_edo(f, x0, y0)  # Obtiene la solución particular
 
-    if(particular_sol is bool and not particular_sol):# Retorna un mensaje de error si no se encuentra solución
-        return False, "No se pudo encontrar una solución analítica para la EDO."  
+    if isinstance(particular_sol, bool) and not particular_sol:  # Retorna un mensaje de error si no se encuentra solución
+        return False, f"No se pudo encontrar una solución analítica para la EDO en ({x0},{y0})."  
     
+
     y_values = []
     valid_x_values = []
     for val in x_values:
