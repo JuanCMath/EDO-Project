@@ -46,7 +46,9 @@ def main(page: ft.Page):
         y_val = float(y_condition_as_string)
         h = float(h_step_as_string)
         n = int(amount_of_steps_as_string)  
-
+        ##TODO : Está dando bateo cuando cuando la y es 0 en el sin
+        #if (y_val == 0.0):
+        #    y_val += 0.0000000001
         # Resolver la EDO por los 3 metodos
         x_values_exact, y_values_exact = Modulo1.Resolution_Algorithms.analitic_solution(f, x_val, y_val, h)
         x_values_euler, y_values_euler = Modulo1.Resolution_Algorithms.euler_improved(f, x_val, y_val, h, n)
@@ -150,8 +152,10 @@ def main(page: ft.Page):
         y_val = float(y_condition_as_string)
         h = float(h_step_as_string)
         n = int(amount_of_steps_as_string)  # Convert the number of steps to int
-
-        # Solucionar la EDO de todas las formas
+        ##TODO : Está dando bateo cuando cuando la y es 0 en el sin
+        #if (y_val == 0.0):
+        #    y_val += 0.0000000001
+        ## Solucionar la EDO de todas las formas
         x_exact, y_exact = Modulo1.Resolution_Algorithms.analitic_solution(f, x_val, y_val, h)
         x_euler, y_euler = Modulo1.Resolution_Algorithms.euler_improved(f, x_val, y_val, h, n)
         x_rk4, y_rk4 = Modulo1.Resolution_Algorithms.runge_kutta_4(f, x_val, y_val, h, n)
