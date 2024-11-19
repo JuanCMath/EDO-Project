@@ -353,13 +353,13 @@ def main(page: ft.Page):
     
     toggle_table_button = ft.ElevatedButton(text="Mostrar Tabla", 
                                            on_click=lambda ignored_parameter: show_table(tb1.value, tb2.value, tb3.value, tb4.value, tb5.value))
-    toggle_table_button = ft.ElevatedButton(text="Guardar esquema", 
+    Plot_Saver_button = ft.ElevatedButton(text="Guardar esquema", 
                                            on_click=lambda ignored_parameter: Open_Buscador())
     # Crea el Box donde van las graficas
     graph_container = ft.Container(width=1000, height=700, alignment=ft.alignment.center)
 
     # Crea una columna para los campos de entrada y botones
-    input_column = ft.Column([tb1, tb2, tb3, tb4, tb5, solving_button, graphing_button,  precision_button, toggle_table_button], 
+    input_column = ft.Column([tb1, tb2, tb3, tb4, tb5, solving_button, graphing_button,  precision_button, toggle_table_button,Plot_Saver_button], 
                              width=300, spacing=10)
 
     # Crea un Box principal donde va a ir todo lo anterior para mostrarse en pantalla
