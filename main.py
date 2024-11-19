@@ -5,7 +5,8 @@ from flet.matplotlib_chart import MatplotlibChart  # Componente Flet para usar g
 import Modulo1.Main_Methods
 import Modulo1.Resolution_Algorithms # Custom module for numerical methods
 from Modulo1.Main_Methods import plot_results, create_graph, plot_isoclines, precision_tester, validate_inputs # Helper functions
-
+from Guardador_De_Archivos import Save
+import io# Biblioteca para guardar como imagen la página
 # Global figures and axes
 fig, ax = plt.subplots()  # Crea una nueva figura y ejes para plotear
 
@@ -31,7 +32,15 @@ def main(page: ft.Page):
     :param page: Página de Flet donde se mostrará la aplicación.
     """
     page.title = "Calculador de Ecuaciones Diferenciales Ordinarias de 1er grado"  # Titulo de la aplicacioon
-  
+    
+    
+    def Open_Buscador():
+        buffer = io.BytesIO()
+        plt.savefig(buffer, format='png')
+        buffer.seek(0)
+
+        Save.main(buffer)
+
     def reset():
         """
         Resetea parametros para funcionamiento de botones.
@@ -322,7 +331,7 @@ def main(page: ft.Page):
 
         page.update() # Refrescando la pagina
         tracker["table"] = True
-        
+
     # Crea los campos de entrada de Texto del usuario
     tb1 = ft.TextField(label="f(x,y)", width=400)
     tb2 = ft.TextField(label="x0", width=400)
@@ -343,7 +352,8 @@ def main(page: ft.Page):
     
     toggle_table_button = ft.ElevatedButton(text="Mostrar Tabla", 
                                            on_click=lambda ignored_parameter: show_table(tb1.value, tb2.value, tb3.value, tb4.value, tb5.value))
-
+    toggle_table_button = ft.ElevatedButton(text="Guardar esquema", 
+                                           on_click=lambda ignored_parameter: Open_Buscador())
     # Crea el Box donde van las graficas
     graph_container = ft.Container(width=1000, height=700, alignment=ft.alignment.center)
 
