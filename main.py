@@ -5,7 +5,7 @@ from flet.matplotlib_chart import MatplotlibChart  # Componente Flet para usar g
 import Modulo1.Main_Methods
 import Modulo1.Resolution_Algorithms # Custom module for numerical methods
 from Modulo1.Main_Methods import plot_results, create_graph, plot_isoclines, precision_tester, validate_inputs # Helper functions
-from Guardador_De_Archivos import Save
+from Plot_Saver import Program
 import io # Biblioteca para guardar como imagen la página
 # Global figures and axes
 fig, ax = plt.subplots()  # Crea una nueva figura y ejes para plotear
@@ -40,7 +40,7 @@ def main(page: ft.Page):
         plt.savefig(buffer, format='png')
         buffer.seek(0)
         #Llamado al Guardador de archivos
-        Save.main(buffer)
+        Program.main(buffer)
 
     def reset():
         """
