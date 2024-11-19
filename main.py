@@ -4,10 +4,25 @@ import sympy as sp  # Libreria para manejar operaciones simbolicas
 from flet.matplotlib_chart import MatplotlibChart  # Componente Flet para usar gráficos de Matplotlib
 import Modulo1.Main_Methods
 import Modulo1.Resolution_Algorithms # Custom module for numerical methods
-from Modulo1.Main_Methods import plot_results, create_graph, plot_isoclines, precision_tester, validate_inputs, inputs_changed # Helper functions
+from Modulo1.Main_Methods import plot_results, create_graph, plot_isoclines, precision_tester, validate_inputs # Helper functions
 
 # Global figures and axes
 fig, ax = plt.subplots()  # Crea una nueva figura y ejes para plotear
+
+tracker ={
+    "solving" : False,
+    "isoclines" : False,
+    "precision" : False,
+    "table" : False
+}
+
+last_inputs = {
+    "derivative": None,
+    "x_condition": None,
+    "y_condition": None,
+    "h_step": None,
+    "amount_of_steps": None
+}
 
 def main(page: ft.Page):
     """
@@ -16,7 +31,45 @@ def main(page: ft.Page):
     :param page: Página de Flet donde se mostrará la aplicación.
     """
     page.title = "Calculador de Ecuaciones Diferenciales Ordinarias de 1er grado"  # Titulo de la aplicacioon
+  
+    def reset():
+        """
+        Resetea parametros para funcionamiento de botones.
+        """
+        global tracker
+        global last_inputs
+        last_inputs = {
+            "derivative": None,
+            "x_condition": None,
+            "y_condition": None,
+            "h_step": None,
+            "amount_of_steps": None
+        }
+        tracker =   {
+            "solving" :False,
+            "isoclines" : False,
+            "precision" : False,
+            "table" : False
+        }
+
+    def inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
+
+        global last_inputs
+        current_inputs = {
+            "derivative": derivative_as_string,
+            "x_condition": x_condition_as_string,
+            "y_condition": y_condition_as_string,
+            "h_step": h_step_as_string,
+            "amount_of_steps": amount_of_steps_as_string
+        }
+        if current_inputs == last_inputs:
+            return False
     
+        reset()
+        last_inputs = current_inputs
+        return True
+    
+
     #Metodo que  resuelve la EDO y grafica sus 3 soluciones en la aplicacion
     def solving(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
         """
@@ -28,12 +81,16 @@ def main(page: ft.Page):
         :param h_step_as_string: Tamaño del paso.
         :param amount_of_steps_as_string: Número de pasos.
         """
-        
+        global last_inputs
+        global tracker
         # Verifica que sean validas las entradas
         is_valid, error_message = validate_inputs(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string)
         if not is_valid:
             page.snack_bar = ft.SnackBar(ft.Text(error_message), open=True)  # Show an error message
             page.update()
+            return
+        
+        if not inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string) and tracker["solving"] == True:
             return
 
         # Define variables simbolicas (x e y)
@@ -66,6 +123,8 @@ def main(page: ft.Page):
             graph_container.content = MatplotlibChart(fig, expand=True)  # Actualizar la grafica del Box
             page.update()  #Updatear la pagina para que se muestre la tabla
 
+        tracker["solving"] = True
+
 
     def on_graphing_click(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
         """
@@ -73,12 +132,16 @@ def main(page: ft.Page):
 
         :param derivative_as_string: Derivada de la EDO en formato de cadena.
         """
-
+        global last_inputs
+        global tracker
         # Verifica si las entradas son validas
-        is_valid, error_message = validate_inputs(derivative_as_string)
+        is_valid, error_message = validate_inputs(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string)
         if not is_valid:
             page.snack_bar = ft.SnackBar(ft.Text(error_message), open=True)  # Show an error message
             page.update()
+            return
+        
+        if not inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string) and tracker["isoclines"] == True:
             return
         
         # Convierte el string entrante en una expresion simbolica
@@ -87,6 +150,8 @@ def main(page: ft.Page):
         plot_isoclines(ax, user_function) #Calcula el campo Direccional y lo muestra
         graph_container.content = MatplotlibChart(fig, expand=True)  #Actualiza el contenido del Box
         page.update() #Refresca la pagina para que se muestr el resultado
+
+        tracker["isoclines"] = True
 
     #Muestra usando funciones continuas como se incrementa la diferencia entre los errores producidos por Euler y RK4
     def show_precision_tester(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
@@ -99,6 +164,12 @@ def main(page: ft.Page):
         :param h_step_as_string: Tamaño del paso.
         :param amount_of_steps_as_string: Número de pasos.
         """
+        global last_inputs
+        global tracker
+
+        if not inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string) and tracker["precision"] == True:
+            return
+        
         ax.clear()
         # Valida las entradas
         is_valid, error_message = validate_inputs(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string)
@@ -106,12 +177,16 @@ def main(page: ft.Page):
             page.snack_bar = ft.SnackBar(ft.Text(error_message), open=True)  # Show an error message
             page.update()
             return
+        
+        
 
 
         # Calcula los errores y los muestra
         precision_tester(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string, ax)
         graph_container.content = MatplotlibChart(fig, expand=True)  # Actualiza el Box
         page.update() #Refresca la pagina
+
+        tracker["precision"] = True
 
 
     #Muestra la tabla de soluciones para el metodo analitico y los 2 numericos junto a los errores cometidos
@@ -125,6 +200,12 @@ def main(page: ft.Page):
         :param h_step_as_string: Tamaño del paso.
         :param amount_of_steps_as_string: Número de pasos.
         """
+        global last_inputs
+        global tracker
+
+        if not inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string) and tracker["table"] == True:
+            return
+        
         ax.clear()
         # Valida las entradas
         is_valid, error_message = validate_inputs(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string)
@@ -240,6 +321,7 @@ def main(page: ft.Page):
         graph_container.content = scrollable_table  # Añadiendo la tabla al Box
 
         page.update() # Refrescando la pagina
+        tracker["table"] = True
         
     # Crea los campos de entrada de Texto del usuario
     tb1 = ft.TextField(label="f(x,y)", width=400)

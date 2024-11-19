@@ -2,6 +2,8 @@ import numpy as np
 import sympy as sp
 from . import Resolution_Algorithms
 
+
+
 def plot_results(ax, t_values_exact, y_values_exact, t_values_euler, y_values_euler, t_values_runge_kutta, y_values_runge_kutta):
     """
     Grafica los resultados de las soluciones exacta, Euler mejorado y Runge-Kutta.
@@ -21,7 +23,6 @@ def plot_results(ax, t_values_exact, y_values_exact, t_values_euler, y_values_eu
     ax.set_ylabel("y")
     ax.set_title("Solución de EDO")
     ax.grid(True)
-    ax.legend()
     ax.set_xlim(-25, 25)
     ax.set_ylim(-25, 25)
 
@@ -40,7 +41,6 @@ def create_graph(ax):
     ax.axhline(0, color="black", lw=1)
     ax.axvline(0, color="black", lw=1)
     ax.grid(True)
-    ax.legend()
 
 def plot_isoclines(ax, f):
     """
@@ -55,7 +55,6 @@ def plot_isoclines(ax, f):
     ax.set_ylabel("y")
     ax.set_title("Solución de EDO")
     ax.grid(True)
-    ax.legend()
     ax.autoscale()
     ax.set_xlim(-25, 25)
     ax.set_ylim(-25, 25)
@@ -116,7 +115,6 @@ def precision_tester(derivative_as_string, x_condition, y_condition, h_step, amo
     ax.set_xlabel('Paso h')
     ax.set_ylabel('Error')
     ax.set_title('Errores de precisión de los métodos numéricos')
-    ax.legend()
     ax.grid(True, which="both", linestyle='--', linewidth=0.5)
 
     # Agregar anotaciones de texto en la gráfica
@@ -167,36 +165,6 @@ def validate_inputs(*inputs):
     return True, ""
 
 
-# Variables globales para almacenar las últimas entradas
-last_inputs = {
-    "derivative": None,
-    "x_condition": None,
-    "y_condition": None,
-    "h_step": None,
-    "amount_of_steps": None
-}
 
-def inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
-    """
-    Verifica si las entradas han cambiado con respecto a las últimas entradas.
 
-    :param derivative_as_string: Derivada de la EDO en formato de cadena.
-    :param x_condition_as_string: Condición inicial para x.
-    :param y_condition_as_string: Condición inicial para y.
-    :param h_step_as_string: Tamaño del paso.
-    :param amount_of_steps_as_string: Número de pasos.
-    :return: True si las entradas han cambiado, False en caso contrario.
-    """
-    global last_inputs
-    current_inputs = {
-        "derivative": derivative_as_string,
-        "x_condition": x_condition_as_string,
-        "y_condition": y_condition_as_string,
-        "h_step": h_step_as_string,
-        "amount_of_steps": amount_of_steps_as_string
-    }
-    if current_inputs == last_inputs:
-        return False
-    
-    last_inputs = current_inputs
-    return True
+
