@@ -48,18 +48,18 @@ def main(page: ft.Page):
         """
         global tracker
         global last_inputs
+        tracker =   {
+            "solving" :False,
+            "isoclines" : False,
+            "precision" : False,
+            "table" : False
+        }
         last_inputs = {
             "derivative": None,
             "x_condition": None,
             "y_condition": None,
             "h_step": None,
             "amount_of_steps": None
-        }
-        tracker =   {
-            "solving" :False,
-            "isoclines" : False,
-            "precision" : False,
-            "table" : False
         }
 
     def inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
@@ -72,7 +72,7 @@ def main(page: ft.Page):
             "h_step": h_step_as_string,
             "amount_of_steps": amount_of_steps_as_string
         }
-        if current_inputs == last_inputs:
+        if current_inputs.values == last_inputs.values:
             return False
     
         reset()
@@ -117,12 +117,12 @@ def main(page: ft.Page):
         n = int(amount_of_steps_as_string)  
 
         # Resolver la EDO por los 3 metodos
-        x_values_exact, y_values_exact = Modulo1.Resolution_Algorithms.analitic_solution(f, x_val, y_val, h)
+        x_values_exact, y_values_exact = Modulo1.Resolution_Algorithms.analitic_solution(derivative_as_string, f, x_val, y_val, h)
         x_values_euler, y_values_euler = Modulo1.Resolution_Algorithms.euler_improved(f, x_val, y_val, h, n)
         x_values_runge_kutta, y_values_runge_kutta = Modulo1.Resolution_Algorithms.runge_kutta_4(f, x_val, y_val, h, n)
 
         if(x_values_exact == False): #Si no se pudo resolver la EDO con los metodos numericos, se muestra un mensaje de error
-            page.snack_bar = ft.SnackBar(ft.Text(y_values_exact), open=True)
+            page.snack_bar = ft.SnackBar(ft.Text(y_values_exact), open=True) #TODO, error: DeprecationWarning: snack_bar is deprecated in version 0.23.0 and will be removed in version 0.26.0. Use Page.overlay.append(snack_bar) instead.
             # Mostrar los resultados sin la solucion exacta
             plot_results(ax, [], [], x_values_euler, y_values_euler, x_values_runge_kutta, y_values_runge_kutta)
             graph_container.content = MatplotlibChart(fig, expand=True)  # Actualizar la grafica del Box

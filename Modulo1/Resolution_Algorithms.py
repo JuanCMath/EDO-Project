@@ -1,6 +1,9 @@
 import numpy as np  # Librería para operaciones matemáticas y manejo de arreglos
 import sympy as sp  # Librería para operaciones simbólicas
 
+last_derivative = None
+last_sol = None
+
 def euler_improved(f, x0, y0, h, n):
     """
     Resuelve una EDO usando el método de Euler mejorado.
@@ -89,7 +92,7 @@ def calculate_isoclines(f, x_range, y_range, num_points=30):
 
     return x_vals, y_vals, u, v
 
-def solve_edo(f, x0, y0):
+def solve_edo(derivative_as_string, f, x0, y0):
     """
     Resuelve una EDO de forma analítica.
 
@@ -98,14 +101,28 @@ def solve_edo(f, x0, y0):
     :param y0: Condición inicial para y.
     :return: Solución particular de la EDO o un mensaje indicando que no existe solución.
     """
+    global last_derivative
+    global last_sol
+
+    print(f"Analyzing: {derivative_as_string}")
     x = sp.symbols('x')  # Define el símbolo x
     y = sp.Function('y')(x)  # Define la función y(x)
-    edo = sp.Eq(y.diff(x), f(x, y))  # Crea la ecuación diferencial
-    try:
-        sol = sp.dsolve(edo, y)  # Intenta resolver la ecuación diferencial
-    except Exception:
-        return False  # Retorna False si no se puede resolver
     
+    if last_derivative is None or derivative_as_string != last_derivative:
+        print("calculating now")
+        edo = sp.Eq(y.diff(x), f(x, y))  # Crea la ecuación diferencial
+        try:
+            sol = sp.dsolve(edo, y)  # Intenta resolver la ecuación diferencial
+        except Exception:
+            return False  # Retorna False si no se puede resolver
+        
+        last_derivative = derivative_as_string
+        last_sol = sol
+        
+    else:
+        print("calculated before, skipping it")
+        sol = last_sol
+
     C = sp.symbols('C')  # Define el símbolo de la constante de integración
     try:
         # Intenta calcular la solución particular con las condiciones iniciales
@@ -115,7 +132,7 @@ def solve_edo(f, x0, y0):
     except:
         return False  # Retorna False si no se puede encontrar la solución particular
 
-def analitic_solution(f, x0, y0, step):
+def analitic_solution(derivative_as_string, f, x0, y0, step):
     """
     Calcula la solución analítica de una EDO en un rango de valores.
 
@@ -139,7 +156,7 @@ def analitic_solution(f, x0, y0, step):
     x_values.sort()  # Ordena los valores de x
 
 
-    particular_sol = solve_edo(f, x0, y0)  # Obtiene la solución particular
+    particular_sol = solve_edo(derivative_as_string, f, x0, y0)  # Obtiene la solución particular
 
     if isinstance(particular_sol, bool) and not particular_sol:  # Retorna un mensaje de error si no se encuentra solución
         return False, f"No se pudo encontrar una solución analítica para la EDO en ({x0},{y0})."  
