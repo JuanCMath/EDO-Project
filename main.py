@@ -5,7 +5,6 @@ from flet.matplotlib_chart import MatplotlibChart  # Componente Flet para usar g
 import Modulo1.Main_Methods
 import Modulo1.Resolution_Algorithms # Custom module for numerical methods
 from Modulo1.Main_Methods import plot_results, create_graph, plot_isoclines, precision_tester, validate_inputs # Helper functions
-from Plot_Saver import Program
 import io # Biblioteca para guardar como imagen la página
 # Global figures and axes
 fig, ax = plt.subplots()  # Crea una nueva figura y ejes para plotear
@@ -32,15 +31,6 @@ def main(page: ft.Page):
     :param page: Página de Flet donde se mostrará la aplicación.
     """
     page.title = "Calculador de Ecuaciones Diferenciales Ordinarias de 1er grado"  # Titulo de la aplicacioon
-    
-    # Método para abrir la interfáz del buscador de archivos
-    def Open_Buscador():
-        #Comandos para guardar la imagen actual como variable
-        buffer = io.BytesIO()
-        plt.savefig(buffer, format='png')
-        buffer.seek(0)
-        #Llamado al Guardador de archivos
-        Program.main(buffer)
 
     def reset():
         """
@@ -48,19 +38,8 @@ def main(page: ft.Page):
         """
         global tracker
         global last_inputs
-        tracker =   {
-            "solving" :False,
-            "isoclines" : False,
-            "precision" : False,
-            "table" : False
-        }
-        last_inputs = {
-            "derivative": None,
-            "x_condition": None,
-            "y_condition": None,
-            "h_step": None,
-            "amount_of_steps": None
-        }
+        tracker = { "solving" :False, "isoclines" : False, "precision" : False, "table" : False }
+        last_inputs = { "derivative": None, "x_condition": None, "y_condition": None, "h_step": None, "amount_of_steps": None }
 
     def inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
 
@@ -79,7 +58,6 @@ def main(page: ft.Page):
         last_inputs = current_inputs
         return True
     
-
     #Metodo que  resuelve la EDO y grafica sus 3 soluciones en la aplicacion
     def solving(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
         """
@@ -135,7 +113,6 @@ def main(page: ft.Page):
 
         tracker["solving"] = True
 
-
     def on_graphing_click(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
         """
         Grafica el campo direccional de la EDO.
@@ -188,16 +165,12 @@ def main(page: ft.Page):
             page.update()
             return
         
-        
-
-
         # Calcula los errores y los muestra
         precision_tester(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string, ax)
         graph_container.content = MatplotlibChart(fig, expand=True)  # Actualiza el Box
         page.update() #Refresca la pagina
 
         tracker["precision"] = True
-
 
     #Muestra la tabla de soluciones para el metodo analitico y los 2 numericos junto a los errores cometidos
     def show_table(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
@@ -238,7 +211,7 @@ def main(page: ft.Page):
         n = int(amount_of_steps_as_string)  # Convert the number of steps to int
 
         # Solucionar la EDO de todas las formas
-        x_exact, y_exact = Modulo1.Resolution_Algorithms.analitic_solution(f, x_val, y_val, h)
+        x_exact, y_exact = Modulo1.Resolution_Algorithms.analitic_solution(derivative_as_string, f, x_val, y_val, h)
         x_euler, y_euler = Modulo1.Resolution_Algorithms.euler_improved(f, x_val, y_val, h, n)
         x_rk4, y_rk4 = Modulo1.Resolution_Algorithms.runge_kutta_4(f, x_val, y_val, h, n)
 
@@ -347,24 +320,20 @@ def main(page: ft.Page):
     graphing_button = ft.ElevatedButton(text="Graficar", 
                                         on_click = lambda ignored_parameter: on_graphing_click(tb1.value, tb2.value, tb3.value, tb4.value, tb5.value))
 
-
     precision_button = ft.ElevatedButton(text="Mostrar Precisión", 
                                          on_click=lambda ignored_parameter: show_precision_tester(tb1.value, float(tb2.value), float(tb3.value), float(tb4.value), float(tb5.value)))
     
     toggle_table_button = ft.ElevatedButton(text="Mostrar Tabla", 
                                            on_click=lambda ignored_parameter: show_table(tb1.value, tb2.value, tb3.value, tb4.value, tb5.value))
-    Plot_Saver_button = ft.ElevatedButton(text="Guardar esquema", 
-                                           on_click=lambda ignored_parameter: Open_Buscador())
+
     # Crea el Box donde van las graficas
     graph_container = ft.Container(width=1000, height=700, alignment=ft.alignment.center)
 
     # Crea una columna para los campos de entrada y botones
-    input_column = ft.Column([tb1, tb2, tb3, tb4, tb5, solving_button, graphing_button,  precision_button, toggle_table_button,Plot_Saver_button], 
-                             width=300, spacing=10)
+    input_column = ft.Column([tb1, tb2, tb3, tb4, tb5, solving_button, graphing_button, precision_button, toggle_table_button], width=300, spacing=10)
 
     # Crea un Box principal donde va a ir todo lo anterior para mostrarse en pantalla
-    main_row = ft.Row([input_column, ft.Container(content=graph_container, expand=True, alignment=ft.alignment.center)],
-                       expand=True, alignment="spaceBetween")
+    main_row = ft.Row([input_column, ft.Container(content=graph_container, expand=True, alignment=ft.alignment.center)], expand=True, alignment="spaceBetween")
 
     page.add(main_row)  # Añade el box principal a la aplicacion
     create_graph(ax)  # Crea el grafico inicial

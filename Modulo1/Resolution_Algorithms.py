@@ -108,12 +108,13 @@ def solve_edo(derivative_as_string, f, x0, y0):
     x = sp.symbols('x')  # Define el símbolo x
     y = sp.Function('y')(x)  # Define la función y(x)
     
-    if last_derivative is None or derivative_as_string != last_derivative:
+    if last_derivative is None or last_derivative != derivative_as_string:
         print("calculating now")
         edo = sp.Eq(y.diff(x), f(x, y))  # Crea la ecuación diferencial
         try:
             sol = sp.dsolve(edo, y)  # Intenta resolver la ecuación diferencial
         except Exception:
+            sol = None
             return False  # Retorna False si no se puede resolver
         
         last_derivative = derivative_as_string
@@ -123,9 +124,9 @@ def solve_edo(derivative_as_string, f, x0, y0):
         print("calculated before, skipping it")
         sol = last_sol
 
-    C = sp.symbols('C')  # Define el símbolo de la constante de integración
     try:
         # Intenta calcular la solución particular con las condiciones iniciales
+        C = sp.symbols('C')  # Define el símbolo de la constante de integración
         particular_sol = sol.subs('C1', C)
         C_value = sp.solve(particular_sol.rhs.subs(x, x0) - y0, C)[0]
         return particular_sol.subs(C, C_value)

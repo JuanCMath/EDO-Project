@@ -83,7 +83,7 @@ def precision_tester(derivative_as_string, x_condition, y_condition, h_step, amo
     h_step = float(h_step)
     n = int(amount_of_steps_as_string)
 
-    x_exact, y_exact = Resolution_Algorithms.analitic_solution(f, x_condition, y_condition, h_step)
+    x_exact, y_exact = Resolution_Algorithms.analitic_solution(derivative_as_string, f, x_condition, y_condition, h_step)
     x_euler, y_euler = Resolution_Algorithms.euler_improved(f, current_x, y_condition, h_step, n)
     x_rk4, y_rk4 = Resolution_Algorithms.runge_kutta_4(f, current_x, y_condition, h_step, n)
 
