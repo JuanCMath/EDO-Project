@@ -1,0 +1,250 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{multirow}
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+
+\title{Proyecto Final de EDO}
+\author{
+    Juan Carlos Carmenate Díaz \\
+    Email: \href{mailto:juancarlosmatcom@gmail.com}{juancarlosmatcom@gmail.com}
+    \and
+    Nombre del Autor 2 \\
+    Email: \href{mailto:autor2@ejemplo.com}{autor2@ejemplo.com}
+    \and
+    Jorge Luis Herrera Cecilia \\
+    Email: \href{mailto:herreraceciliajorgeluis@gmail.com}{herreraceciliajorgeluis@gmail.com}
+    \and
+    Sebastian González Alfonso\\
+    Email: \href{mailto:sebagon106z@gmail.com}{sebagonz106@gmail.com}
+}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+\textbf{Faultad de Matemática y Computación, Universidad de La Habana}
+\end{center}
+
+\begin{center}
+\textbf{Tema V:} Un acercamiento más profundo al método de Runge-Kutta.
+\end{center}
+
+\begin{abstract}
+Este proyecto tiene como objetivo realizar una comparación entre el metodo de Euler mejorado (que podría considerarse un Runge-Kutta de 2do orden) y el metodo de Runge-Kutta mas utilizado por su versatilidad, el de 4to orden. Para ello se propuso la realizacion de una aplicacion graficadora de las funciones soluciones de EDOs introducidas, que muestren el resultado de utilizar ambos métodos junto a la solución real explicita en caso de que pueda hallarse analíticamente. 
+\end{abstract}
+
+\section{Introducción}
+Las ecuaciones diferenciales son tan antiguas como el cálculo diferencial mismo y fueron abordadas por Isaac Newton desde épocas tan remotas como 1671 en su tratado sobre cálculo diferencial, presentando su solución mediante desarrollo en series infinitas. El comportamiento de la solución de una EDO se vuelve interesante para el caso no lineal, donde no es posible en general encontrar una solución analítica exacta. La solución de EDOs mediante métodos discretos es también una de las áreas más antiguas y exitosas del cómputo numérico.\\ Los problemas de valores iniciales o problemas de Cauchy son unos de los más comunes modelados con EDOs. La ecuación diferencial es usada para representar la evolución de una variable de estado en un proceso físico; el problema consiste en encontrar los valores que tomará dicha variable partiendo de un valor inicial \(y(x_0) = y_0\).\\ El método de Euler es el más sencillo de los métodos de paso simple para resolver numéricamente el problema de Cauchy de primer orden. Fue formulado por Leonhard Euler (15-4-1707, Suiza - 18-9-1783, Rusia) en 1768 en la última sección de su Institutiones Calculi Integralis. Aunque tiene detractores debido a la necesidad de tomar un paso muy pequeño para garantizar su convergencia, sirvió de base a métodos más complejos desarrollados por Runge, Heun y Kutta un siglo después.\\ 
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}[b]{0.3\textwidth} 
+    \centering 
+    \includegraphics[width=\textwidth]{img/euler.png} \caption{Leonhard Euler} 
+    \label{fig:imagen1} \end{minipage}
+    \hfill 
+    \begin{minipage}[b]{0.3\textwidth} 
+    \centering 
+    \includegraphics[width=\textwidth]{img/runge.png} \caption{Carl Runge} 
+    \label{fig:imagen2} \end{minipage} 
+    \hfill 
+     \begin{minipage}[b]{0.3\textwidth} 
+    \centering 
+    \includegraphics[width=\textwidth]{img/kutta.png} \caption{Martin Kutta} 
+    \label{fig:imagen3} 
+    \end{minipage} 
+\end{figure}
+Carl David Tolmé Runge fue un matemático, físico y espectroscopista alemán (30-8-1856 Bremen, Alemania - 3-1-1927, Goettingen, Alemania). Pasó los primeros años de su vida en La Habana, donde su padre Julius Runge ejercía como cónsul danés. En 1880 recibió su doctorado en matemática en Berlín, donde había estudiado con Karl Weierstrass. El cráter Runge de la Luna le debe su nombre.\\
+Martin Wilhelm Kutta (3-11-1867 Pitschen, Polonia - 25-12-1944 Alemania), físico, matemático e ingeniero hidráulico alemán. Realizó sus estudios universitarios en la ciudad polaca de Breslau. Posteriormente, se dirigió a Múnich donde continuó sus estudios universitarios durante otros 4 años, para convertirse más tarde en colaborador de von Dyck.\\
+La idea de los hoy llamados métodos de Runge-Kutta tuvieron en realidad un contribuyente más, Heun, ya que fueron Runge (1895) y Heun (1900) quienes originalmente los construyeron, para luego ser elaborados más ampliamente y formulados en su expresión general por Kutta en 1901. Estos métodos incluyen pasos adicionales del método de Euler, para sustituirlos como aproximación del segundo argumento de la función \(f(x, y)\) de la parte derecha de la ecuación diferencial, logrando así fórmulas de cuadratura para integrar la ecuación diferencial, que hicieran más rápido el cálculo de la solución del Problema de Cauchy de primer orden.
+
+
+\section{Comparación entre Euler mejorado y Runge-Kutta de 4to orden} 
+Como se mencionó anteriormente, ambos procedimientos numéricos constituyen casos particulares de métodos de Runge-Kutta de orden distinto, por lo que esta sección se centrará en analizar a estos métodos en general y concluirá con la comparación específica propuesta.\\
+El fundamento de estos métodos consiste en calcular la nueva ordenada \(y_{n+1}\) adicionando a la anterior \(y_n\) un incremento \(\Delta y_n\) que coincida con el desarrollo en serie de Taylor de la solución exacta \(y(x_n + h)\) hasta el término de la derivada de orden \(s\), pero que sólo use la primera derivada \(f\), sin requerir la evaluación de derivadas superiores. El incremento \(\Delta y_n\) se obtiene como combinación lineal de valores de \(y' = f\), que corresponden a la evaluación de \(f\) en \(s\) puntos del subintervalo \([x_n, x_n + h]\).\\
+En su forma más general un método de Runge-Kutta puede escribirse de la siguiente manera, con \(s\) denotando la cantidad de etapas del método:
+\begin{equation} 
+y_{n+1} = y_n + \Delta y_n = y_n + h \sum_{i=1}^{s} b_i K_i \quad ,
+\end{equation} 
+\begin{equation} K_i = f \left( x_n + c_i h, y_n + h \sum_{j=1}^{s} a_{ij} K_j \right) , \quad i = 1, 2, \ldots, s 
+\end{equation}
+Los coeficientes \(a_{ij}\), \(b_i\) y \(c_i\) caracterizan completamente el método de Runge-Kutta. Por definición, 
+\begin{equation}
+c_1 = 0, \quad 0 < c_i \leq 1, \quad i > 1 \quad \text{y} \quad c_i = \sum_{j=1}^{s} a_{ij}.
+\end{equation}
+Si los elementos \(a_{ij}\) son nulos para \(j \geq i\), con \(i = 1, 2, \ldots, s\), entonces cada \(K_i\) puede ser calculado de forma explícita en términos de cada uno de los \(i-1\) coeficientes \(K_1, \ldots, K_{i-1}\). En este caso estaremos en presencia de un método de Runge-Kutta explícito. En caso contrario, estaremos en presencia de un método de Runge-Kutta implícito en los que para calcular el coeficiente \(K_i\) es necesario resolver un sistema no lineal con \(s\) ecuaciones, pero estos no son objetivos del presente trabajo. Si \(h\) mantiene su valor a lo largo del procedimiento, se dice que el método es de paso fijo.\\
+Los coeficientes \(a_{ij}\), \(b_i\) y \(c_i\) se determinan bajo la condición de que el desarrollo en serie de Taylor del valor aproximado \(y_{n+1}\) calculado según coincida con el desarrollo en serie de Taylor hasta el término de orden \(s\) de la solución exacta, lo cual equivale a exigir que el incremento de Runge coincida con el incremento de Taylor. La diferencia entre ambos métodos radica en que mientras en Taylor el incremento se construye como combinación lineal de las \(s\) primeras derivadas de \(y\) evaluadas en \(x = x_n\), en Runge-Kutta se construye como combinación lineal de las funciones \(K_i\), es decir, de la función \(f\) evaluada en \(s\) puntos cuyas abscisas se encuentran en el intervalo \([x_n, x_{n+1}]\); lo cual computacionalmente resulta más eficiente y justifica su vigencia un siglo después de ser propuesto.\\
+Para \(s = 2\), el incremento está definido por:
+
+\begin{equation}
+\Delta y_n = h (b_1 K_1 + b_2 K_2)
+\end{equation}
+
+donde:
+
+\begin{equation}
+K_1 = f(x_n, y_n)
+\end{equation}
+
+\begin{equation}
+K_2 = f(x_n + c_2 h, y_n + h a_{21} K_1)
+\end{equation}
+
+Si se utiliza el desarrollo de Taylor en \(K_2\), podemos llegar a la expresión:
+\begin{equation}
+y_{n+1} = y_{n} + h (b_1 + b_2) f(x_n, y_n) + h^2 \left[b_2 \left(c_2 f_x + a_{21} f f_y\right) (x_n, y_n)\right] + O(h^3)
+\end{equation}
+que al igualarla término a término con el desarrollo de Taylor de \(y_{n+1}\) en el punto \(x_n\) hasta el término de segundo orden:
+
+\begin{equation}
+y_{n+1} = y_n + h y_n' + \frac{h^2}{2} y_n'' \quad
+\end{equation}
+nos queda, para una constante arbitraria \( \theta \geq \frac{1}{2}\)
+\begin{equation}
+b_2 = \theta, \quad b_1 = 1 - \theta, \quad c_2 = a_{21} = \frac{1}{2\theta}.
+\end{equation}
+
+Con \(\theta = \frac{1}{2}\) obtenemos la expresión conocida del método de Euler mejorado, pero para otros valores pueden obtenerse otras fórmulas de Runge-Kutta de 2do orden, todas con error de método o error de truncamiento del orden de \(h^3\), o lo que es lo mismo, error de discretización local del orden de \(h^2\) (ver sección 3).\\
+Para un número mayor de etapas la deducción de la fórmula general es más engorrosa y usa herramientas numéricas que no son objetivo de este trabajo, por lo que se usará la fórmula general definida en (1) y (2) sin demostrar. Es común ver representados los coeficientes que aparecen en dicha expresión en la estructura conocida como arreglo de Butcher, donde \(A = (a_{ij}) \in \mathbb{R}^{s \times s}\), \(b = (b_1, b_2, \ldots, b_s)^T \in \mathbb{R}^s\) y \(c = (c_1, c_2, \ldots, c_s)^T \in \mathbb{R}^s\):
+\[
+\begin{array}{c|cccc}
+c_1 & a_{11} & a_{12} & \ldots & a_{1s} \\
+c_2 & a_{21} & a_{22} & \ldots & a_{2s} \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+c_s & a_{s1} & a_{s2} & \ldots & a_{ss} \\
+\hline
+& b_1 & b_2 & \ldots & b_s \\
+\end{array}
+\]
+
+
+
+o
+
+
+
+\[
+\left( \begin{array}{c|c}
+c & A \\
+\hline
+& b^T \\
+\end{array} \right)
+\]
+
+Teniendo esto, particularicémoslo en los casos que más nos interesan:
+
+\begin{enumerate}
+    \item \textbf{Método de Euler} (\(s = 1, b_1 = 1\)):
+    
+
+\[ y_{n+1} = y_n + h f(x_n, y_n) \]
+
+
+    Fórmula de orden 1 basada en la regla de los rectángulos.
+
+    \item \textbf{Método de Euler mejorado} (\(s = 2, b_1 = 0, b_2 = 1, a_{21} = c_2 = \frac{1}{2}\)):
+    
+
+\[ y_{n+1} = y_n + h f \left( x_n + \frac{h}{2}, y_n + \frac{h}{2} f(x_n, y_n) \right) \]
+
+
+    Fórmula de orden 2 basada en la regla del punto medio, cuyo arreglo de Butcher sería:
+    
+
+\[
+    \begin{array}{c|cc}
+    0 & 0 & 0 \\
+    \frac{1}{2} & \frac{1}{2} & 0 \\
+    \hline
+    & 0 & 1 \\
+    \end{array}
+    \]
+
+    \item \textbf{Método clásico de Runge-Kutta} (\(s = 4\)):
+    
+
+\[ y_{n+1} = y_n + \frac{h}{6} (K_1 + 2K_2 + 2K_3 + K_4) \quad \]
+
+
+    donde:
+    
+
+\[ K_1 = f(x_n, y_n) \]
+
+
+    
+
+\[ K_2 = f \left( x_n + \frac{1}{2} h, y_n + \frac{h}{2} K_1 \right) \]
+
+
+    
+
+\[ K_3 = f \left( x_n + \frac{1}{2} h, y_n + \frac{h}{2} K_2 \right) \]
+
+
+    
+
+\[ K_4 = f (x_n + h, y_n + h K_3) \]
+
+Fórmula de orden 4 basada en la regla de Simpson con error de método \(O(h^5)\), que se obtiene a partir de un sistema de 11 condiciones para la determinación de las 13 incógnitas \(b_1, b_2, b_3, b_4; c_2, c_3, c_4; a_{21}, a_{31}, a_{32}, a_{41}, a_{42}, a_{43}\). Existen varios arreglos de Butcher a partir de los cuales se obtienen métodos de Runge-Kutta de 4to orden. Sin embargo, este es el más comúnmente utilizado.
+
+\[
+\begin{array}{c|cccc}
+    0 & 0 & 0 & 0 & 0\\
+    \frac{1}{2} & \frac{1}{2} & 0 & 0 & 0\\
+    \frac{1}{2} & 0 & \frac{1}{2} & 0 & 0 \\
+    1 & 0 & 0 & 1 & 0\\
+    \hline
+    & \frac{1}{6} & \frac{1}{3} & \frac{1}{3} & \frac{1}{6}\\
+    \end{array}
+    \]
+\end{enumerate}
+
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|p{4cm}|p{4cm}|p{4cm}|}
+\hline
+\textbf{Parámetro} & \textbf{Euler Mejorado} & \textbf{Runge-Kutta (4to orden)} \\
+\hline
+Error de truncamiento o de método & Valor 1 & Unidad 1 \\
+\hline
+Error de discretización & Valor 2 & Unidad 2 \\
+\hline
+Cantidad de evaluaciones de la función para una misma cantidad de etapas & Valor 2 & Unidad 2 \\
+\hline
+\end{tabular}
+\caption{Comparación entre los métodos de Euler mejorado (EM) y Runge-Kutta de 4to orden (RK4)}
+\label{tab:resultados}
+\end{table}
+
+En la tabla puede apreciarse que en general RK4 es más preciso que EM, pues para valores pequeños de \(h\) (\(h < 1\)) se cumple que \(h^4<h^2\). Sin embargo, debe valorarse la complejidad de utilizar RK4, puesto que para una misma cantidad de subintervalos necesita realizar el doble de las operaciones (i.e. evaluaciones en la función) que EM; aunque con algo de cuidado puede balancearse el tamaño del paso \(h\) con la cantidad de operaciones a realizar para obtener en RK4 una solución más acertada y a la vez más óptima.\\
+Ninguno de los dos métodos anteriormente analizados está excento de errores y debe tenerse especial cuidado en funciones con asíntotas internas que llevan a la función a \(\pm\infty\) (o en funciones con cambios drásticos en los valores de su imagen en general), pues los más mínimos errores de cálculo debidos a la aritmética de punto flotante utilizada en el aparato de cómputo sobre el que se trabaja pueden alterar considerablemente los resultados.
+
+\section{Conclusiones}
+Resumen de las conclusiones principales del proyecto y sugerencias para trabajos futuros.
+
+
+\begin{thebibliography}{99}
+\bibitem{referencia1}
+León Mecías, Angela M. \textit{Notas de Clases}. 2022.
+\bibitem{referencia2}
+EDWARDS, C. HENRY; PENNEY, DAVID E. \textit{Ecuaciones diferenciales y problemas con valores en la frontera. Cuarta edición}. PEARSON EDUCACIÓN, México, 2009
+\end{thebibliography}
+
+\section{Apéndice}
+Aquí puedes añadir información adicional, como el siguiente ejemplo de una fórmula con el símbolo de la sumatoria:
+
+\begin{equation}
+\sum_{i=1}^{n} i = \frac{n(n+1)}{2}
+\end{equation}
+
+\end{document}
+
