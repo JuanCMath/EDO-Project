@@ -1,8 +1,8 @@
-import numpy as np  # Librería para operaciones matemáticas y manejo de arreglos
-import sympy as sp  # Librería para operaciones simbólicas
+import numpy as np
+import sympy as sp
 
-last_derivative = None
-last_sol = None
+last_derivative, last_sol = None, None
+
 
 def euler_improved(f, x0, y0, h, n):
     """
@@ -15,8 +15,7 @@ def euler_improved(f, x0, y0, h, n):
     :param n: Número de pasos.
     :return: Tuple (x_values, y_values) con los valores de x e y calculados.
     """
-    x_values = [x0]
-    y_values = [y0]
+    x_values, y_values = [x0], [y0]
 
     for i in range(n):
         x = x_values[-1]
@@ -33,6 +32,7 @@ def euler_improved(f, x0, y0, h, n):
 
     return x_values, y_values
 
+
 def runge_kutta_4(f, x0, y0, h, n):
     """
     Resuelve una EDO usando el método de Runge-Kutta de 4º orden.
@@ -44,24 +44,23 @@ def runge_kutta_4(f, x0, y0, h, n):
     :param n: Número de pasos.
     :return: Tuple (x_values, y_values) con los valores de x e y calculados.
     """
-    x_values = [x0]
-    y_values = [y0]
+    x_values, y_values = [x0], [y0]
     
     for i in range(n):
-        x = x_values[-1]
-        y = y_values[-1]
-        
+        x, y = x_values[-1], y_values[-1]
+
         k1 = f(x, y)  # Calcula la pendiente en el punto inicial
-        k2 = f(x + h / 2, y + h * k1 / 2)  # Calcula la pendiente en el punto medio usando k1
-        k3 = f(x + h / 2, y + h * k2 / 2)  # Calcula la pendiente en el punto medio usando k2
-        k4 = f(x + h, y + h * k3)  # Calcula la pendiente en el punto final usando k3
+        k2 = f(x + h/2, y + h*k1/2)  # Calcula la pendiente en el punto medio usando k1
+        k3 = f(x + h/2, y + h*k2/2)  # Calcula la pendiente en el punto medio usando k2
+        k4 = f(x + h, y + h*k3)  # Calcula la pendiente en el punto final usando k3
         
-        y_next = y + (h / 6) * (k1 + 2 * k2 + 2 * k3 + k4)  # Calcula el valor de y en el siguiente paso
+        y_next = y + (h/6) * (k1 + 2*k2 + 2*k3 + k4)  # Calcula el valor de y en el siguiente paso
         
         x_values.append(round(x + h, 3))  # Agrega el nuevo valor de x a la lista
         y_values.append(y_next)  # Agrega el nuevo valor de y a la lista
     
     return x_values, y_values
+
 
 def calculate_isoclines(f, x_range, y_range, num_points=30):
     """
@@ -73,24 +72,22 @@ def calculate_isoclines(f, x_range, y_range, num_points=30):
     :param num_points: Número de puntos para la malla.
     :return: Tuple (x, y, u, v) con los valores calculados para graficar las isoclinas.
     """
-    # Define las variables simbólicas
-    x, y = sp.symbols('x y')
 
-    # Crea una malla de puntos
-    x_vals, y_vals = np.meshgrid(np.linspace(x_range[0], x_range[1], num_points), np.linspace(y_range[0], y_range[1], num_points))
+    x, y = sp.symbols('x y')# Define las variables simbólicas
 
-    # Evalúa la función simbólica en cada punto de la malla
-    f_vals = np.zeros_like(x_vals, dtype=float)
+    x_vals, y_vals = np.meshgrid(np.linspace(x_range[0], x_range[1], num_points), np.linspace(y_range[0], y_range[1], num_points))# Crea una malla de puntos
+
+    f_vals = np.zeros_like(x_vals, dtype=float)# Evalúa la función simbólica en cada punto de la malla
+
     for i in range(x_vals.shape[0]):
         for j in range(x_vals.shape[1]):
             f_vals[i, j] = float(f.subs({x: x_vals[i, j], y: y_vals[i, j]}))
 
-    # Crea una matriz de unos con la misma forma que f_vals
-    u = np.ones_like(f_vals)
-    # Normaliza los valores de f para obtener las direcciones de las isoclinas
-    v = f_vals / np.sqrt(1 + f_vals**2)
+    u = np.ones_like(f_vals)# Crea una matriz de unos con la misma forma que f_vals
+    v = f_vals / np.sqrt(1 + f_vals**2)# Normaliza los valores de f para obtener las direcciones de las isoclinas
 
     return x_vals, y_vals, u, v
+
 
 def solve_edo(derivative_as_string, f, x0, y0):
     """
@@ -101,10 +98,10 @@ def solve_edo(derivative_as_string, f, x0, y0):
     :param y0: Condición inicial para y.
     :return: Solución particular de la EDO o un mensaje indicando que no existe solución.
     """
+
     global last_derivative
     global last_sol
 
-    print(f"Analyzing: {derivative_as_string}")
     x = sp.symbols('x')  # Define el símbolo x
     y = sp.Function('y')(x)  # Define la función y(x)
     
@@ -113,13 +110,12 @@ def solve_edo(derivative_as_string, f, x0, y0):
         edo = sp.Eq(y.diff(x), f(x, y))  # Crea la ecuación diferencial
         try:
             sol = sp.dsolve(edo, y)  # Intenta resolver la ecuación diferencial
-        except Exception:
+        except:
             sol = None
             return False  # Retorna False si no se puede resolver
         
         last_derivative = derivative_as_string
         last_sol = sol
-        
     else:
         print("calculated before, skipping it")
         sol = last_sol
@@ -132,6 +128,7 @@ def solve_edo(derivative_as_string, f, x0, y0):
         return particular_sol.subs(C, C_value)
     except:
         return False  # Retorna False si no se puede encontrar la solución particular
+
 
 def analitic_solution(derivative_as_string, f, x0, y0, step):
     """
@@ -156,7 +153,6 @@ def analitic_solution(derivative_as_string, f, x0, y0, step):
         x_values.append(round(helper, 3))  # Agrega los valores de x hacia la derecha
     x_values.sort()  # Ordena los valores de x
 
-
     particular_sol = solve_edo(derivative_as_string, f, x0, y0)  # Obtiene la solución particular
 
     if isinstance(particular_sol, bool) and not particular_sol:  # Retorna un mensaje de error si no se encuentra solución
@@ -173,7 +169,7 @@ def analitic_solution(derivative_as_string, f, x0, y0, step):
                 valid_x_values.append(val)
             else:
                 print(f"Error: La función no está definida en x = {val}")
-        except Exception as e:
+        except:
             print(f"Error: Funcion {particular_sol} no definida en x = {val}")
     
     return valid_x_values, y_values  # Retorna los valores de x e y válidos

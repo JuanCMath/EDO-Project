@@ -3,28 +3,29 @@ import sympy as sp
 from . import Resolution_Algorithms
 
 
-
-def plot_results(ax, t_values_exact, y_values_exact, t_values_euler, y_values_euler, t_values_runge_kutta, y_values_runge_kutta):
+def plot_results(ax, x_values_exact, y_values_exact, x_values_euler, y_values_euler, x_values_runge_kutta, y_values_runge_kutta):
     """
     Grafica los resultados de las soluciones exacta, Euler mejorado y Runge-Kutta.
 
     :param ax: Ejes de Matplotlib donde se graficarán los resultados.
-    :param t_values_exact: Valores de tiempo de la solución exacta.
+    :param x_values_exact: Valores de tiempo de la solución exacta.
     :param y_values_exact: Valores de y de la solución exacta.
-    :param t_values_euler: Valores de tiempo de la solución de Euler mejorado.
+    :param x_values_euler: Valores de tiempo de la solución de Euler mejorado.
     :param y_values_euler: Valores de y de la solución de Euler mejorado.
-    :param t_values_runge_kutta: Valores de tiempo de la solución de Runge-Kutta.
+    :param x_values_runge_kutta: Valores de tiempo de la solución de Runge-Kutta.
     :param y_values_runge_kutta: Valores de y de la solución de Runge-Kutta.
     """
-    ax.plot(t_values_exact, y_values_exact, label='Solucion Exacta', color='green', linewidth=2)
-    ax.plot(t_values_euler, y_values_euler, label='Euler Mejorado', marker='o', markersize=4, linestyle='--', color='blue')
-    ax.plot(t_values_runge_kutta, y_values_runge_kutta, label='Runge-Kutta 4º Orden', marker='x', markersize=6, linestyle=':', color='red')
+
+    ax.plot(x_values_exact, y_values_exact, label='Solucion Exacta', color='green', linewidth=2)
+    ax.plot(x_values_euler, y_values_euler, label='Euler Mejorado', marker='o', markersize=4, linestyle='--', color='blue')
+    ax.plot(x_values_runge_kutta, y_values_runge_kutta, label='Runge-Kutta 4º Orden', marker='x', markersize=6, linestyle=':', color='red')
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_title("Solución de EDO")
     ax.grid(True)
     ax.set_xlim(-25, 25)
     ax.set_ylim(-25, 25)
+
 
 def create_graph(ax):
     """
@@ -42,6 +43,7 @@ def create_graph(ax):
     ax.axvline(0, color="black", lw=1)
     ax.grid(True)
 
+
 def plot_isoclines(ax, f):
     """
     Grafica las isoclinas de la EDO.
@@ -49,6 +51,7 @@ def plot_isoclines(ax, f):
     :param ax: Ejes de Matplotlib donde se graficarán las isoclinas.
     :param f: Función que representa la derivada de la EDO.
     """
+
     t, y, u, v = Resolution_Algorithms.calculate_isoclines(f, (-25, 25), (-25, 25))
     ax.quiver(t, y, u, v, color='gray', alpha=0.5)
     ax.set_xlabel("x")
@@ -58,6 +61,7 @@ def plot_isoclines(ax, f):
     ax.autoscale()
     ax.set_xlim(-25, 25)
     ax.set_ylim(-25, 25)
+
 
 def precision_tester(derivative_as_string, x_condition, y_condition, h_step, amount_of_steps_as_string, ax):
     """
@@ -70,6 +74,7 @@ def precision_tester(derivative_as_string, x_condition, y_condition, h_step, amo
     :param amount_of_steps_as_string: Número de pasos.
     :param ax: Ejes de Matplotlib donde se graficarán los errores.
     """
+
     x, y = sp.symbols('x y')
     user_function = sp.sympify(derivative_as_string)
     f = sp.lambdify((x, y), user_function, modules=['sympy'])
@@ -97,20 +102,20 @@ def precision_tester(derivative_as_string, x_condition, y_condition, h_step, amo
                 break
     
         for i in range (n):
-            if (first_index + i < len(y_exact)): 
-                error_euler = abs(y_euler[i] - y_exact[first_index + i] )
-                error_rk4 = abs(y_rk4[i] - y_exact[first_index + i])
-
-                euler_errors.append(error_euler)
-                rk4_errors.append(error_rk4)
-                steps.append(current_x + h_step * i)
-            else :
+            if (first_index + i) >= len(y_exact):
                 break
+
+            error_euler = abs(y_euler[i] - y_exact[first_index + i] )
+            error_rk4 = abs(y_rk4[i] - y_exact[first_index + i])
+
+            euler_errors.append(error_euler)
+            rk4_errors.append(error_rk4)
+            steps.append(current_x + h_step * i)
+            
         # Graficar los errores
         ax.plot(steps, euler_errors, label='Error Método de Euler', color='blue', marker='o', linestyle='-', markersize=6)
         ax.plot(steps, rk4_errors, label='Error Método RK4', color='red', marker='s', linestyle='--', markersize=6)
 
-    
     ax.set_yscale('log')
     ax.set_xlabel('Paso h')
     ax.set_ylabel('Error')
@@ -121,6 +126,7 @@ def precision_tester(derivative_as_string, x_condition, y_condition, h_step, amo
     for step, euler_error, rk4_error in zip(steps, euler_errors, rk4_errors):
         ax.text(step, rk4_error, f'{float(rk4_error):.2e}', fontsize=5, va='bottom', ha='center', color='red')
         ax.text(step, euler_error, f'{float(euler_error):.2e}', fontsize=5, va='top', ha='center', color='blue')
+
 
 def validate_inputs(*inputs):
     """
@@ -163,8 +169,3 @@ def validate_inputs(*inputs):
         return False, "Invalid numerical input in amount_of_steps."
     
     return True, ""
-
-
-
-
-
