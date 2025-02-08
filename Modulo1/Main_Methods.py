@@ -170,3 +170,33 @@ def validate_inputs(*inputs):
         return False, "Invalid numerical input in amount_of_steps."
     
     return True, ""
+
+
+def plot_newton_interpolation(ax, f, x0, y0, h, n):
+    """
+    Grafica el polinomio de interpolación de Newton usando puntos generados por Runge-Kutta.
+
+    :param ax: Ejes de Matplotlib donde se graficarán los resultados.
+    :param f: Función que representa la derivada de la EDO.
+    :param x0: Condición inicial para x.
+    :param y0: Condición inicial para y.
+    :param h: Tamaño del paso.
+    :param n: Número de pasos.
+    """
+    # Generar puntos con Runge-Kutta
+    x_rk, y_rk = Resolution_Algorithms.runge_kutta_4(f, x0, y0, h, n)
+
+    # Puntos para evaluar el polinomio de Newton en un rango extendido
+    x_eval_extendido = np.linspace(-30, 30, 1000)  # 1000 puntos entre -30 y 30
+    y_interp_extendido = Resolution_Algorithms.evaluar_polinomio_newton_extendido(x_rk, y_rk, x_eval_extendido)
+
+    # Graficar los resultados
+    ax.plot(x_rk, y_rk, 'bo', label='Puntos de Runge-Kutta')  # Puntos generados por Runge-Kutta
+    ax.plot(x_eval_extendido, y_interp_extendido, 'y-', label='Polinomio de Newton Extendido')  # Polinomio de Newton extendido
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_title('Interpolación de Newton usando puntos de Runge-Kutta')
+    ax.legend()
+    ax.grid(True)
+    ax.set_xlim(-30, 30)  # Ajustar límites de los ejes x
+    ax.set_ylim(-30, 30)  # Ajustar límites de los ejes y

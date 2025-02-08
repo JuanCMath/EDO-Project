@@ -105,8 +105,7 @@ def main(page: ft.Page):
             page.update()  #Updatear la pagina para que se muestre la tabla
 
         tracker["solving"] = True
-
-
+        
     def on_graphing_click(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
         """
         Grafica el campo direccional de la EDO.
@@ -306,6 +305,51 @@ def main(page: ft.Page):
         page.update() # Refrescando la pagina
         tracker["table"] = True
 
+    def show_newton_interpolation(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
+        """
+        Muestra la interpolación de Newton usando puntos generados por Runge-Kutta.
+
+        :param derivative_as_string: Derivada de la EDO en formato de cadena.
+        :param x_condition_as_string: Condición inicial para x.
+        :param y_condition_as_string: Condición inicial para y.
+        :param h_step_as_string: Tamaño del paso.
+        :param amount_of_steps_as_string: Número de pasos.
+        """
+        global last_inputs
+        global tracker
+
+        # Valida las entradas
+        is_valid, error_message = Modulo1.Main_Methods.validate_inputs(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string)
+        if not is_valid:
+            page.snack_bar = ft.SnackBar(ft.Text(error_message), open=True)  # Show an error message
+            page.update()
+            return
+
+        if not inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string) and tracker.get("newton_interpolation"):
+            return
+        if inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
+            ax.clear()  # Limpiar las gráficas si hay cambios en las entradas
+
+        # Define variables simbólicas (x e y)
+        x, y = sp.symbols('x y')
+        # Convierte el string en una expresión simbólica
+        user_function = sp.sympify(derivative_as_string)
+        # Convierte la expresión simbólica en una función numérica evaluable
+        f = sp.lambdify((x, y), user_function, modules=['sympy'])
+
+        # Conversión de datos de las entradas
+        x_val = float(x_condition_as_string)
+        y_val = float(y_condition_as_string)
+        h = float(h_step_as_string)
+        n = int(amount_of_steps_as_string)
+
+        # Graficar la interpolación de Newton
+        Modulo1.Main_Methods.plot_newton_interpolation(ax, f, x_val, y_val, h, n)
+        graph_container.content = MatplotlibChart(fig, expand=True)  # Actualizar la gráfica del Box
+        page.update()  # Actualizar la página para que se muestre la gráfica
+
+        tracker["newton_interpolation"] = True
+
     # Crea los campos de entrada de Texto del usuario
     tb1 = ft.TextField(label="f(x,y)", width=400)
     tb2 = ft.TextField(label="x0", width=400)
@@ -323,10 +367,12 @@ def main(page: ft.Page):
     
     toggle_table_button = ft.ElevatedButton(text="Mostrar Tabla", on_click=lambda ignored_parameter: show_table(tb1.value, tb2.value, tb3.value, tb4.value, tb5.value))
 
+    newton_interpolation_button = ft.ElevatedButton(text="Mostrar Interpolación de Newton", on_click=lambda ignored_parameter: show_newton_interpolation(tb1.value, tb2.value, tb3.value, tb4.value, tb5.value))
+
     graph_container = ft.Container(width=1000, height=700, alignment=ft.alignment.center)
 
     # Crea una columna para los campos de entrada y botones
-    input_column = ft.Column([tb1, tb2, tb3, tb4, tb5, solving_button, graphing_button, precision_button, toggle_table_button], width=300, spacing=10)
+    input_column = ft.Column([tb1, tb2, tb3, tb4, tb5, solving_button, graphing_button, precision_button, toggle_table_button, newton_interpolation_button], width=300, spacing=10)
 
     # Crea un Box principal donde va a ir todo lo anterior para mostrarse en pantalla
     main_row = ft.Row([input_column, ft.Container(content=graph_container, expand=True, alignment=ft.alignment.center)], expand=True, alignment="spaceBetween")

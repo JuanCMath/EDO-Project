@@ -173,3 +173,27 @@ def analitic_solution(derivative_as_string, f, x0, y0, step):
             print(f"Error: Funcion {particular_sol} no definida en x = {val}")
     
     return valid_x_values, y_values  # Retorna los valores de x e y válidos
+
+def NewtonInterpol(x, y, x_eval):
+    k = len(x)
+    diferencias = diferencias_divididas(x, y)
+    resultado = diferencias[0]
+    for i in range(1, k):
+        termino = diferencias[i]
+        for j in range(i):
+            termino *= (x_eval - x[j])
+        resultado += termino
+    return resultado
+
+def diferencias_divididas(x, y):
+    n = len(x)
+    F = [[0] * n for _ in range(n)]
+    for i in range(n):
+        F[i][0] = y[i]
+    for j in range(1, n):
+        for i in range(n - j):
+            F[i][j] = (F[i+1][j-1] - F[i][j-1]) / (x[i+j] - x[i])
+    return [F[0][i] for i in range(n)]
+
+def evaluar_polinomio_newton_extendido(x, y, x_vals):
+    return [NewtonInterpol(x, y, xi) for xi in x_vals]
