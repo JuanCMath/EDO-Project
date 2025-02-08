@@ -29,6 +29,7 @@ def main(page: ft.Page):
         global last_inputs
         tracker = { "solving" :False, "isoclines" : False, "precision" : False, "table" : False }
         last_inputs = { "derivative": None, "x_condition": None, "y_condition": None, "h_step": None, "amount_of_steps": None }
+        ax.clear()  # Limpiar las gráficas
 
 
     def inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
@@ -70,6 +71,8 @@ def main(page: ft.Page):
         
         if not inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string) and tracker["solving"] == True:
             return
+        if inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
+            ax.clear()  # Limpiar las gráficas si hay cambios en las entradas
 
         # Define variables simbolicas (x e y)
         x, y = sp.symbols('x y')
@@ -121,6 +124,8 @@ def main(page: ft.Page):
         
         if not inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string) and tracker["isoclines"] == True:
             return
+        if inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
+            ax.clear()  # Limpiar las gráficas si hay cambios en las entradas
         
         # Convierte el string entrante en una expresion simbolica
         user_function = sp.sympify(derivative_as_string)
@@ -147,6 +152,8 @@ def main(page: ft.Page):
 
         if not inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string) and tracker["precision"] == True:
             return
+        if inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
+            ax.clear()  # Limpiar las gráficas si hay cambios en las entradas
         
         ax.clear()
         # Valida las entradas
@@ -179,6 +186,8 @@ def main(page: ft.Page):
 
         if not inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string) and tracker["table"] == True:
             return
+        if inputs_changed(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string):
+            ax.clear()  # Limpiar las gráficas si hay cambios en las entradas
         
         ax.clear()
         # Valida las entradas
@@ -324,5 +333,6 @@ def main(page: ft.Page):
 
     page.add(main_row)  # Añade el box principal a la aplicacion
     Modulo1.Main_Methods.create_graph(ax)  # Crea el grafico inicial
+    ax.legend()  # Añadir leyenda a la gráfica inicial
 
 ft.app(main)  # Inicia la aplicacion de Flet

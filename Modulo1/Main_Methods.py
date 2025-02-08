@@ -25,6 +25,7 @@ def plot_results(ax, x_values_exact, y_values_exact, x_values_euler, y_values_eu
     ax.grid(True)
     ax.set_xlim(-25, 25)
     ax.set_ylim(-25, 25)
+    ax.legend()  # Añadir leyenda a la gráfica
 
 
 def create_graph(ax):
