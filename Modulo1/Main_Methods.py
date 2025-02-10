@@ -2,7 +2,6 @@ import numpy as np
 import sympy as sp
 from . import Resolution_Algorithms
 
-
 def plot_results(ax, x_values_exact, y_values_exact, x_values_euler, y_values_euler, x_values_runge_kutta, y_values_runge_kutta):
     """
     Grafica los resultados de las soluciones exacta, Euler mejorado y Runge-Kutta.
@@ -27,7 +26,6 @@ def plot_results(ax, x_values_exact, y_values_exact, x_values_euler, y_values_eu
     ax.set_ylim(-25, 25)
     ax.legend()  # Añadir leyenda a la gráfica
 
-
 def create_graph(ax):
     """
     Crea un gráfico inicial con una línea horizontal en y=0.
@@ -43,7 +41,6 @@ def create_graph(ax):
     ax.axhline(0, color="black", lw=1)
     ax.axvline(0, color="black", lw=1)
     ax.grid(True)
-
 
 def plot_isoclines(ax, f):
     """
@@ -62,7 +59,6 @@ def plot_isoclines(ax, f):
     ax.autoscale()
     ax.set_xlim(-25, 25)
     ax.set_ylim(-25, 25)
-
 
 def precision_tester(derivative_as_string, x_condition, y_condition, h_step, amount_of_steps_as_string, ax):
     """
@@ -89,7 +85,7 @@ def precision_tester(derivative_as_string, x_condition, y_condition, h_step, amo
     h_step = float(h_step)
     n = int(amount_of_steps_as_string)
 
-    x_exact, y_exact = Resolution_Algorithms.analitic_solution(derivative_as_string, f, x_condition, y_condition, h_step)
+    x_exact, y_exact = Resolution_Algorithms.analitic_solution(derivative_as_string, f, current_x, y_condition, h_step)
     x_euler, y_euler = Resolution_Algorithms.euler_improved(f, current_x, y_condition, h_step, n)
     x_rk4, y_rk4 = Resolution_Algorithms.runge_kutta_4(f, current_x, y_condition, h_step, n)
 
@@ -127,7 +123,6 @@ def precision_tester(derivative_as_string, x_condition, y_condition, h_step, amo
     for step, euler_error, rk4_error in zip(steps, euler_errors, rk4_errors):
         ax.text(step, rk4_error, f'{float(rk4_error):.2e}', fontsize=5, va='bottom', ha='center', color='red')
         ax.text(step, euler_error, f'{float(euler_error):.2e}', fontsize=5, va='top', ha='center', color='blue')
-
 
 def validate_inputs(*inputs):
     """
@@ -170,7 +165,6 @@ def validate_inputs(*inputs):
         return False, "Invalid numerical input in amount_of_steps."
     
     return True, ""
-
 
 def plot_newton_interpolation(ax, f, x0, y0, h, n):
     """

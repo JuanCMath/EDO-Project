@@ -3,7 +3,6 @@ import sympy as sp
 
 last_derivative, last_sol = None, None
 
-
 def euler_improved(f, x0, y0, h, n):
     """
     Resuelve una EDO usando el método de Euler mejorado.
@@ -66,7 +65,7 @@ def calculate_isoclines(f, x_range, y_range, num_points=30):
     """
     Calcula y grafica las isoclinas de una EDO.
 
-    :param f_sympy: Función simbólica que representa la derivada de la EDO.
+    :param f: Función simbólica que representa la derivada de la EDO.
     :param x_range: Rango de valores para x.
     :param y_range: Rango de valores para y.
     :param num_points: Número de puntos para la malla.
@@ -93,6 +92,7 @@ def solve_edo(derivative_as_string, f, x0, y0):
     """
     Resuelve una EDO de forma analítica.
 
+    :param derivative_as_string: Derivada de la EDO en formato de cadena.
     :param f: Función que representa la derivada de la EDO.
     :param x0: Condición inicial para x.
     :param y0: Condición inicial para y.
@@ -134,6 +134,7 @@ def analitic_solution(derivative_as_string, f, x0, y0, step):
     """
     Calcula la solución analítica de una EDO en un rango de valores.
 
+    :param derivative_as_string: Derivada de la EDO en formato de cadena.
     :param f: Función que representa la derivada de la EDO.
     :param x0: Condición inicial para x.
     :param y0: Condición inicial para y.
@@ -175,6 +176,14 @@ def analitic_solution(derivative_as_string, f, x0, y0, step):
     return valid_x_values, y_values  # Retorna los valores de x e y válidos
 
 def NewtonInterpol(x, y, x_eval):
+    """
+    Calcula la interpolación de Newton para un conjunto de puntos.
+
+    :param x: Lista de valores de x.
+    :param y: Lista de valores de y.
+    :param x_eval: Valor de x en el que se evaluará el polinomio de Newton.
+    :return: Valor interpolado en x_eval.
+    """
     k = len(x)
     diferencias = diferencias_divididas(x, y)
     resultado = diferencias[0]
@@ -186,6 +195,13 @@ def NewtonInterpol(x, y, x_eval):
     return resultado
 
 def diferencias_divididas(x, y):
+    """
+    Calcula las diferencias divididas para la interpolación de Newton.
+
+    :param x: Lista de valores de x.
+    :param y: Lista de valores de y.
+    :return: Lista de diferencias divididas.
+    """
     n = len(x)
     F = [[0] * n for _ in range(n)]
     for i in range(n):
@@ -196,4 +212,12 @@ def diferencias_divididas(x, y):
     return [F[0][i] for i in range(n)]
 
 def evaluar_polinomio_newton_extendido(x, y, x_vals):
+    """
+    Evalúa el polinomio de Newton extendido en un conjunto de valores de x.
+
+    :param x: Lista de valores de x.
+    :param y: Lista de valores de y.
+    :param x_vals: Lista de valores de x en los que se evaluará el polinomio.
+    :return: Lista de valores interpolados.
+    """
     return [NewtonInterpol(x, y, xi) for xi in x_vals]

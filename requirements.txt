@@ -1,5 +1,7 @@
 flet
+sympy
 matplotlib
 numpy
-sympy
-scipy
+sphinx
+myst-parser
+furo
