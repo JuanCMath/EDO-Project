@@ -233,8 +233,8 @@ def show_table(derivative_as_string, x_condition_as_string, y_condition_as_strin
         table_rows = [
             ft.DataRow(cells=[
                 ft.DataCell(ft.Text(f"{x_euler[i]:.2f}")),
-                ft.DataCell(ft.Text(f"{float(y_euler[i])::.2f}")),
-                ft.DataCell(ft.Text(f"{float(y_rk4[i])::.2f}"))
+                ft.DataCell(ft.Text(f"{float(y_euler[i]):.2f}")),
+                ft.DataCell(ft.Text(f"{float(y_rk4[i]):.2f}"))
             ]) for i in range(len(x_euler))
         ]
 
