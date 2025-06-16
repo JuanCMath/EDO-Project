@@ -8,7 +8,7 @@ import Modulo1.Resolution_Algorithms
 # Global figures and axes
 fig, ax = plt.subplots()  # Crea una nueva figura y ejes para plotear
 
-tracker ={ "solving" : False, "isoclines" : False, "precision" : False, "table" : False }
+tracker ={ "solving" : False, "isoclines" : False, "precision" : False, "table" : False, "newton_interpolation": False }
 last_inputs = { "derivative": None, "x_condition": None, "y_condition": None, "h_step": None, "amount_of_steps": None }
 
 def reset():
@@ -17,7 +17,7 @@ def reset():
     """
     global tracker
     global last_inputs
-    tracker = { "solving" :False, "isoclines" : False, "precision" : False, "table" : False }
+    tracker = { "solving" :False, "isoclines" : False, "precision" : False, "table" : False, "newton_interpolation": False }
     last_inputs = { "derivative": None, "x_condition": None, "y_condition": None, "h_step": None, "amount_of_steps": None }
     ax.clear()  # Limpiar las gráficas
 
@@ -175,6 +175,7 @@ def show_precision_tester(derivative_as_string, x_condition_as_string, y_conditi
     
     # Calcula los errores y los muestra
     Modulo1.Main_Methods.precision_tester(derivative_as_string, x_condition_as_string, y_condition_as_string, h_step_as_string, amount_of_steps_as_string, ax)
+    ax.legend()  # Añadir leyenda a la gráfica
     graph_container.content = MatplotlibChart(fig, expand=True)  # Actualiza el Box
     page.update() #Refresca la pagina
 
@@ -396,7 +397,7 @@ def main(page: ft.Page):
     graph_container = ft.Container(width=1000, height=700, alignment=ft.alignment.center)
 
     # Crea una columna para los campos de entrada y botones
-    input_column = ft.Column([tb1, tb2, tb3, tb4, tb5, solving_button, graphing_button, precision_button,  newton_interpolation_button, toggle_table_button], width=300, spacing=10)
+    input_column = ft.Column([tb1, tb2, tb3, tb4, tb5, solving_button, graphing_button,newton_interpolation_button,precision_button, toggle_table_button], width=300, spacing=10)
 
     # Crea un Box principal donde va a ir todo lo anterior para mostrarse en pantalla
     main_row = ft.Row([input_column, ft.Container(content=graph_container, expand=True, alignment=ft.alignment.center)], expand=True, alignment="spaceBetween")
